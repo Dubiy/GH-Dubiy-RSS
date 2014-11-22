@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ua.ck.geekhub.android.dubiy.rss" >
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".activity.StartActivity"
+            android:label="@string/title_activity_start" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.ActivityMultipane"
+            android:label="@string/title_activity_activity_multipane" >
+        </activity>
+        <activity
+            android:name=".activity.ActivityMultipaneRight"
+            android:label="@string/title_activity_activity_multipane_right" >
+        </activity>
+        <activity
+            android:name=".activity.ThreadTest"
+            android:label="@string/title_activity_thread_test" >
+        </activity>
+        <activity
+            android:name=".activity.ActivityJSON"
+            android:label="@string/title_activity_activity_json"
+            android:theme="@style/Theme.Gary" >
+        </activity>
+        <activity
+            android:name=".activity.ActivityJSONright"
+            android:label="@string/title_activity_activity_jsonright"
+            android:parentActivityName=".activity.ActivityJSON"
+            android:theme="@style/Theme.Gary" >
+        </activity>
+        <activity
+            android:name=".activity.NinePatch"
+            android:label="@string/title_activity_nine_patch"
+            android:parentActivityName=".activity.StartActivity"
+            android:theme="@style/Theme.Gary">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ua.ck.geekhub.android.dubiy.ufo.activity.StartActivity" />
+        </activity>
+    </application>
+
+</manifest>

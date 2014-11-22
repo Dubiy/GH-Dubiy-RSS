@@ -51,6 +51,13 @@ public class StartActivity extends Activity implements TopicsFragment.OnFragment
         ArticleFragment articleFragment = (ArticleFragment)getFragmentManager().findFragmentById(R.id.fragment_article);
         if (articleFragment != null) {
             try {
+                /**
+                 * articleFragment.loadArticle(position) в try тому, що виникає виключна ситуація при наступних умовах:
+                 * на планшеті в портретній орієнтації (коли на екрані лише один фрагмент) може виникати помилка,
+                 * якщо перед цим екран був в альбомній орієнтації (на екран виводився другий фрагмент - ArticleFragment)
+                 * В цьому випадку getFragmentManager().findFragmentById(R.id.fragment_article) повертає не null,
+                 * але при виклику методу loadArticle(position) програма помирає
+                 * */
                 articleFragment.loadArticle(position);
             } catch (Exception e) {
                 Intent intent = new Intent(this, ArticleActivity.class);

@@ -3,29 +3,36 @@ package ua.ck.geekhub.android.dubiy.rssreader.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
-import ua.ck.geekhub.android.dubiy.rssreader.fragment.TopicsFragment;
 
+public class ArticleActivity extends Activity implements ArticleFragment.OnFragmentInteractionListener {
+    public static final String ARG_ARTICLE_POSITION = "ARTICLE_POSITION";
+    private int articlePosition = -2;
 
-public class StartActivity extends Activity implements TopicsFragment.OnFragmentInteractionListener, ArticleFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
+        setContentView(R.layout.activity_article);
+
+
+        /*
+        Intent intent = getIntent();
+        articlePosition = intent.getExtras().getInt(ARG_ARTICLE_POSITION, -3);
+        Toast.makeText(getApplicationContext(), "articlePosition extra " + articlePosition, Toast.LENGTH_LONG).show();
+        */
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.start, menu);
+        getMenuInflater().inflate(R.menu.article, menu);
         return true;
     }
 
@@ -43,24 +50,10 @@ public class StartActivity extends Activity implements TopicsFragment.OnFragment
 
     @Override
     public void onFragmentInteraction(int position) {
+        Toast.makeText(getApplicationContext(), "Fragments interaction (ArticleActivity) " + position, Toast.LENGTH_SHORT).show();
 
 
 
 
-
-        ArticleFragment articleFragment = (ArticleFragment)getFragmentManager().findFragmentById(R.id.fragment_article);
-        if (articleFragment != null) {
-            try {
-                articleFragment.loadArticle(position);
-            } catch (Exception e) {
-                Intent intent = new Intent(this, ArticleActivity.class);
-                intent.putExtra(ArticleActivity.ARG_ARTICLE_POSITION, position);
-                startActivity(intent);
-            }
-        } else {
-            Intent intent = new Intent(this, ArticleActivity.class);
-            intent.putExtra(ArticleActivity.ARG_ARTICLE_POSITION, position);
-            startActivity(intent);
-        }
     }
 }

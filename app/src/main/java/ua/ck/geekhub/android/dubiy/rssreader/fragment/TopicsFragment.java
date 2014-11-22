@@ -1,25 +1,31 @@
 package ua.ck.geekhub.android.dubiy.rssreader.fragment;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
+import ua.ck.geekhub.android.dubiy.rssreader.adapter.ArrayAdapterItem;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link Topics.OnFragmentInteractionListener} interface
+ * {@link TopicsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link Topics#newInstance} factory method to
+ * Use the {@link TopicsFragment#newInstance} factory method to
  * create an instance of this fragment.
  *
  */
-public class Topics extends Fragment {
+public class TopicsFragment extends Fragment {
+
+    private ListView listView;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -40,15 +46,15 @@ public class Topics extends Fragment {
      * @return A new instance of fragment Topics.
      */
     // TODO: Rename and change types and number of parameters
-    public static Topics newInstance(String param1, String param2) {
-        Topics fragment = new Topics();
+    public static TopicsFragment newInstance(String param1, String param2) {
+        TopicsFragment fragment = new TopicsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
-    public Topics() {
+    public TopicsFragment() {
         // Required empty public constructor
     }
 
@@ -62,16 +68,32 @@ public class Topics extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_topics, container, false);
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        listView = (ListView) view.findViewById(R.id.listView);
+
+        String[] list_items = getResources().getStringArray(R.array.simple_list);
+        listView.setAdapter(new ArrayAdapterItem(getActivity(), R.layout.list_item, list_items));
+        listView.setOnItemClickListener(new ListView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView adapterView, View view, int position, long id) {
+//                Toast.makeText(getActivity().getApplicationContext(), "poz " + position, Toast.LENGTH_SHORT).show();
+                mListener.onFragmentInteraction(position);
+            }
+        });
+
+
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onButtonPressed(int position) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onFragmentInteraction(position);
         }
     }
 
@@ -104,7 +126,7 @@ public class Topics extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        public void onFragmentInteraction(int position);
     }
 
 }

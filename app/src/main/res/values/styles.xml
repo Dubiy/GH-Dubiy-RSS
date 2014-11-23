@@ -1,8 +1,50 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="Theme.Gary" parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/ActionBar.Solid.Gary</item>
+    </style>
+
+    <style name="ActionBar.Solid.Gary" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
+        <item name="android:background">@drawable/ab_solid_gary</item>
+    </style>
+
+    <style name="ListItemStyle">
+        <!-- i dunno how to use it correctly -->
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textColor">#ffffffff</item>
+        <item name="android:textSize">15dp</item>
+    </style>
+
+    <style name="ListItemStyle.Holder">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingBottom">5dp</item>
+    </style>
+
+    <style name="ListItemStyle.Title">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">Title</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textStyle">bold</item>
+        <!--<item name="android:paddingTop">5dp</item>-->
+        <!--<item name="android:paddingLeft">10dp</item>-->
+        <!--<item name="android:paddingRight">10dp</item>-->
+    </style>
+
+    <style name="ListItemStyle.Date">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">Date</item>
+        <item name="android:layout_below">@+id/textViewTitle</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_alignParentEnd">true</item>
+        <!--<item name="android:layout_marginRight">5dp</item>-->
+        <!--<item name="android:layout_marginBottom">10dp</item>-->
     </style>
 
 </resources>

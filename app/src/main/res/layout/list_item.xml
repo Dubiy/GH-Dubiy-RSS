@@ -9,7 +9,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/textViewItem"
         android:textSize="15dp"
-        android:padding="10dp" >
+        android:padding="10dp"
+        android:background="@drawable/item_customized_background" >
+
     </TextView>
 
 </RelativeLayout>

@@ -6,7 +6,7 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_frag">FragActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
+    <string name="url">https://ajax.googleapis.com/ajax/services/feed/load?v=2.0&amp;q=http://habrahabr.ru/rss/best/weekly/&amp;num=20</string>
     <string-array name="simple_list">
         <item>item 1</item>
         <item>item 2</item>
@@ -25,5 +25,6 @@
     </string-array>
 
     <string name="title_activity_article">ArticleActivity</string>
+    <string name="action_refresh">Refresh</string>
 
 </resources>

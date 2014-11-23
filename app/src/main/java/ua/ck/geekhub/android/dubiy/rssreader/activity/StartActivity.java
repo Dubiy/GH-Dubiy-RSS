@@ -2,11 +2,13 @@ package ua.ck.geekhub.android.dubiy.rssreader.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.widget.ListView;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
@@ -14,13 +16,41 @@ import ua.ck.geekhub.android.dubiy.rssreader.fragment.TopicsFragment;
 
 
 public class StartActivity extends Activity implements TopicsFragment.OnFragmentInteractionListener, ArticleFragment.OnFragmentInteractionListener {
+    private final String LOG_TAG = getClass().getSimpleName();
+
+    private TopicsFragment topicsFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.clear();
+        editor.commit();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        topicsFragment = (TopicsFragment) getFragmentManager().findFragmentById(R.id.fragment_topics);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int position = prefs.getInt(ArticleActivity.ARG_ARTICLE_POSITION, -1);
+        if (position != -1) {
+            if (topicsFragment != null) {
+                ListView listView = (ListView) findViewById(R.id.listView);
+                listView.setItemChecked(position, true);
+
+                ArticleFragment articleFragment = (ArticleFragment)getFragmentManager().findFragmentById(R.id.fragment_article);
+                if (articleFragment != null) {
+                    articleFragment.loadArticle(position);
+                }
+
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -34,20 +64,26 @@ public class StartActivity extends Activity implements TopicsFragment.OnFragment
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+
+        switch (item.getItemId()) {
+            case R.id.action_settings: {
+                Log.d(LOG_TAG, "menu Settings");
+            } break;
+            case R.id.action_refresh: {
+                Log.d(LOG_TAG, "menu Refresh");
+                topicsFragment.refresh_posts();
+            } break;
+            default: {
+                return super.onOptionsItemSelected(item);
+            }
         }
-        return super.onOptionsItemSelected(item);
+        return true;
+
+
     }
 
     @Override
     public void onFragmentInteraction(int position) {
-
-
-
-
-
         ArticleFragment articleFragment = (ArticleFragment)getFragmentManager().findFragmentById(R.id.fragment_article);
         if (articleFragment != null) {
             try {

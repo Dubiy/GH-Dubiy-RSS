@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/ListItemStyle.Holder"
+    android:background="@drawable/item_customized_background">
+
+    <TextView
+        style="@style/ListItemStyle.Title"
+        android:id="@+id/textViewTitle"
+        android:textColor="@drawable/item_customized_title_color"
+    />
+    <TextView
+        style="@style/ListItemStyle.Date"
+        android:id="@+id/textViewDate"
+        android:textColor="@drawable/item_customized_subtitle_color"
+    />
+
+</RelativeLayout>

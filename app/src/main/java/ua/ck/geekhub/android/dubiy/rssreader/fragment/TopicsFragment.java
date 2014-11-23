@@ -3,6 +3,7 @@ package ua.ck.geekhub.android.dubiy.rssreader.fragment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,59 +13,28 @@ import android.widget.Toast;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.adapter.ArrayAdapterItem;
+import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
+import ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder;
+import ua.ck.geekhub.android.dubiy.rssreader.utils.PostLoader;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link TopicsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link TopicsFragment#newInstance} factory method to
- * create an instance of this fragment.
- *
- */
+import static ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder.getPosts;
+
 public class TopicsFragment extends Fragment {
-
+    private final String LOG_TAG = getClass().getSimpleName();
     private ListView listView;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private OnFragmentInteractionListener mListener;
+    private View view;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment Topics.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static TopicsFragment newInstance(String param1, String param2) {
-        TopicsFragment fragment = new TopicsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
     public TopicsFragment() {
-        // Required empty public constructor
+    }
+
+    public interface OnFragmentInteractionListener {
+        public void onFragmentInteraction(int position);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -75,26 +45,20 @@ public class TopicsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        this.view = view;
         listView = (ListView) view.findViewById(R.id.listView);
 
-        String[] list_items = getResources().getStringArray(R.array.simple_list);
-        listView.setAdapter(new ArrayAdapterItem(getActivity(), R.layout.list_item, list_items));
+        if (savedInstanceState == null) {
+            refresh_posts();
+        }
+
+        listView.setAdapter(new HabraAdapter(getActivity(), R.layout.habra_list_item, PostHolder.getPosts()));
         listView.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView adapterView, View view, int position, long id) {
-//                Toast.makeText(getActivity().getApplicationContext(), "poz " + position, Toast.LENGTH_SHORT).show();
                 mListener.onFragmentInteraction(position);
             }
         });
-
-
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(int position) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(position);
-        }
     }
 
     @Override
@@ -103,8 +67,7 @@ public class TopicsFragment extends Fragment {
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+            throw new ClassCastException(activity.toString() + " must implement OnFragmentInteractionListener");
         }
     }
 
@@ -114,19 +77,12 @@ public class TopicsFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(int position);
+    public void refresh_posts() {
+        //Log.d(LOG_TAG, "refresh_posts() fragment");
+        PostLoader postLoader = new PostLoader(getActivity(), view);
+        postLoader.refresh_posts();
     }
+
+
 
 }

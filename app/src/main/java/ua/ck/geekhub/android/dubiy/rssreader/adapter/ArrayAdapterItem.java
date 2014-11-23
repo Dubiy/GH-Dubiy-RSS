@@ -27,7 +27,10 @@ public class ArrayAdapterItem extends ArrayAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        //TODO viewHolder
+//        HabraViewHolder holder;
+//        HabraPost
+
+
         if (convertView == null) {
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
             convertView = inflater.inflate(layoutResourceId, parent, false);

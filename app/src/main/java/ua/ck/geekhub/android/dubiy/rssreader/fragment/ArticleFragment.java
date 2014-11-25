@@ -39,6 +39,8 @@ public class ArticleFragment extends Fragment {
 
     public void loadArticle(int position) {
         //Toast.makeText(getActivity().getApplicationContext(), "loadArticle " + position, Toast.LENGTH_SHORT).show();
+        articlePosition = position;
+        Log.d(LOG_TAG, "loadArticle(" + position + ")");
         HabraPost post = PostHolder.getPost(position);
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -48,23 +50,59 @@ public class ArticleFragment extends Fragment {
             ListView listView = (ListView)getActivity().findViewById(R.id.left_drawer);
             listView.setItemChecked(position, true);
 
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getActivity().getApplicationContext());
             SharedPreferences.Editor editor = prefs.edit();
             editor.putInt(ARG_ARTICLE_POSITION, position);
             editor.commit();
+
+            SharedPreferences prefz = PreferenceManager.getDefaultSharedPreferences(this.getActivity().getApplicationContext());
+            Log.d(LOG_TAG, "SharedPreferences pos(" + prefz.getInt(ArticleActivity.ARG_ARTICLE_POSITION, -1) + ")");
         }
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(LOG_TAG, "onResume. articlePosition: " + articlePosition);
+        if (articlePosition != -1) {
+            loadArticle(articlePosition);
+        }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
         Bundle args = getActivity().getIntent().getExtras();
+        Log.d(LOG_TAG, "onActivityCreated @@@onStart");
         if (args != null) {
             articlePosition = args.getInt(ARG_ARTICLE_POSITION, -1);
-            if (articlePosition != -1) {
-                loadArticle(articlePosition);
-            }
+            Log.d(LOG_TAG, "onActivityCreated @@@onStart. articlePosition: " + articlePosition);
         }
+
+        Log.d(LOG_TAG, "onActivityCreated()");
+        if (savedInstanceState != null) {
+            Log.d(LOG_TAG, "onActivityCreated. savedInstanceState: " + savedInstanceState.toString());
+            int tmpArticlePosition = savedInstanceState.getInt(ARG_ARTICLE_POSITION, -1);
+            Log.d(LOG_TAG, "onActivityCreated. tmpArticlePosition: " + tmpArticlePosition);
+            if (tmpArticlePosition != -1) {
+                articlePosition = tmpArticlePosition;
+            }
+            Log.d(LOG_TAG, "onActivityCreated. articlePosition: " + articlePosition);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(LOG_TAG, "onSaveInstanceState. articlePosition: " + articlePosition);
+        outState.putInt(ARG_ARTICLE_POSITION, articlePosition);
     }
 
     @Override

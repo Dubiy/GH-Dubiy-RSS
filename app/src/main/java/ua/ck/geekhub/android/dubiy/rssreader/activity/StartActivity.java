@@ -35,20 +35,33 @@ public class StartActivity extends Activity implements TopicsFragment.OnFragment
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(LOG_TAG, "onResume");
         topicsFragment = (TopicsFragment) getFragmentManager().findFragmentById(R.id.fragment_topics);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         int position = prefs.getInt(ArticleActivity.ARG_ARTICLE_POSITION, -1);
+        //WTF!? o_O
+        //коли повертається на цю актівіті з альбомної орієнтації, то в SharedPreferences ПУСТО!!!
+        //костилі і велосіпєди
         if (position != -1) {
+            Log.d(LOG_TAG, "pos == " + position);
+
             if (topicsFragment != null) {
                 ListView listView = (ListView) findViewById(R.id.listView);
+                Log.d(LOG_TAG, "setItemChecked" + position);
                 listView.setItemChecked(position, true);
-
-                ArticleFragment articleFragment = (ArticleFragment)getFragmentManager().findFragmentById(R.id.fragment_article);
-                if (articleFragment != null) {
-                    articleFragment.loadArticle(position);
-                }
-
             }
+
+            ArticleFragment articleFragment = (ArticleFragment) getFragmentManager().findFragmentById(R.id.fragment_article);
+            if (articleFragment != null) {
+                try {
+                    articleFragment.loadArticle(position);
+                } catch (Exception e) {
+                    Log.d(LOG_TAG, "articleFragment != null");
+                    e.printStackTrace();
+                }
+            }
+
+
         }
     }
 
@@ -68,11 +81,13 @@ public class StartActivity extends Activity implements TopicsFragment.OnFragment
         switch (item.getItemId()) {
             case R.id.action_settings: {
                 Log.d(LOG_TAG, "menu Settings");
-            } break;
+            }
+            break;
             case R.id.action_refresh: {
                 Log.d(LOG_TAG, "menu Refresh");
                 topicsFragment.refresh_posts();
-            } break;
+            }
+            break;
             default: {
                 return super.onOptionsItemSelected(item);
             }
@@ -84,7 +99,7 @@ public class StartActivity extends Activity implements TopicsFragment.OnFragment
 
     @Override
     public void onFragmentInteraction(int position) {
-        ArticleFragment articleFragment = (ArticleFragment)getFragmentManager().findFragmentById(R.id.fragment_article);
+        ArticleFragment articleFragment = (ArticleFragment) getFragmentManager().findFragmentById(R.id.fragment_article);
         if (articleFragment != null) {
             try {
                 /**

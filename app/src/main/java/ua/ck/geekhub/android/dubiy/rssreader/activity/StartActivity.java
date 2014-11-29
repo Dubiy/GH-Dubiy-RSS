@@ -1,6 +1,8 @@
 package ua.ck.geekhub.android.dubiy.rssreader.activity;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,33 +17,66 @@ import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.TopicsFragment;
 
 
-public class StartActivity extends Activity implements TopicsFragment.OnFragmentInteractionListener, ArticleFragment.OnFragmentInteractionListener {
-    private final String LOG_TAG = getClass().getSimpleName();
-
-    private TopicsFragment topicsFragment;
-
+public class StartActivity extends BaseActivity implements TopicsFragment.OnFragmentInteractionListener, ArticleFragment.OnFragmentInteractionListener {
+    private final String LOG_TAG = LOG_TAG_PREFIX + getClass().getSimpleName();
+    private boolean isMultiPanel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        //TODO вставить сюди перевірку чи TopicsFragment вже існує. щоб не перестворювати його заново
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.clear();
-        editor.commit();
+        isMultiPanel = findViewById(R.id.fragment_article) != null;
+
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        TopicsFragment topicsFragment = TopicsFragment.newInstance();
+        fragmentTransaction.replace(R.id.fragment_topics, topicsFragment);
+
+        if (isMultiPanel) {
+            //TODO show default Article here. maybe app info, or short help
+            ArticleFragment articleFragment = new ArticleFragment();
+            fragmentTransaction.replace(R.id.fragment_article, articleFragment);
+        }
+
+        //create frsagments here
+        //if article frag here, load empty frag
+
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.d(LOG_TAG, "onBackPressed. isMultiPanel: " + isMultiPanel);
+        if ( ! isMultiPanel) {
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
+        super.onBackPressed();
+
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(LOG_TAG, "onResume");
+        isMultiPanel = findViewById(R.id.fragment_article) != null;
+        Log.d(LOG_TAG, "onResume. isMultiPanel: " + isMultiPanel);
+
+        /**
+         * ПЕРЕПИСАТЬ
+         * */
+
+/*
         topicsFragment = (TopicsFragment) getFragmentManager().findFragmentById(R.id.fragment_topics);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         int position = prefs.getInt(ArticleActivity.ARG_ARTICLE_POSITION, -1);
         //WTF!? o_O
         //коли повертається на цю актівіті з альбомної орієнтації, то в SharedPreferences ПУСТО!!!
-        //костилі і велосіпєди
+
         if (position != -1) {
             Log.d(LOG_TAG, "pos == " + position);
 
@@ -62,21 +97,20 @@ public class StartActivity extends Activity implements TopicsFragment.OnFragment
             }
 
 
-        }
+        }*/
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.start, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        /**
+         *  НАПИСАТЬ КОД ТУТ!
+         * */
 
         switch (item.getItemId()) {
             case R.id.action_settings: {
@@ -85,7 +119,7 @@ public class StartActivity extends Activity implements TopicsFragment.OnFragment
             break;
             case R.id.action_refresh: {
                 Log.d(LOG_TAG, "menu Refresh");
-                topicsFragment.refresh_posts();
+                //topicsFragment.refresh_posts();
             }
             break;
             default: {
@@ -99,25 +133,16 @@ public class StartActivity extends Activity implements TopicsFragment.OnFragment
 
     @Override
     public void onFragmentInteraction(int position) {
-        ArticleFragment articleFragment = (ArticleFragment) getFragmentManager().findFragmentById(R.id.fragment_article);
-        if (articleFragment != null) {
-            try {
-                /**
-                 * articleFragment.loadArticle(position) в try тому, що виникає виключна ситуація при наступних умовах:
-                 * на планшеті в портретній орієнтації (коли на екрані лише один фрагмент) може виникати помилка,
-                 * якщо перед цим екран був в альбомній орієнтації (на екран виводився другий фрагмент - ArticleFragment)
-                 * В цьому випадку getFragmentManager().findFragmentById(R.id.fragment_article) повертає не null,
-                 * але при виклику методу loadArticle(position) програма помирає
-                 * */
-                articleFragment.loadArticle(position);
-            } catch (Exception e) {
-                Intent intent = new Intent(this, ArticleActivity.class);
-                intent.putExtra(ArticleActivity.ARG_ARTICLE_POSITION, position);
-                startActivity(intent);
-            }
+        Log.d(LOG_TAG, "onFragmentInteraction. isMultiPanel: " + isMultiPanel + ". position: " + position);
+        if (isMultiPanel) {
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            ArticleFragment articleFragment = ArticleFragment.newInstance(position);
+            fragmentTransaction.replace(R.id.fragment_article, articleFragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
         } else {
             Intent intent = new Intent(this, ArticleActivity.class);
-            intent.putExtra(ArticleActivity.ARG_ARTICLE_POSITION, position);
+            intent.putExtra(ArticleActivity.ARG_ACTIVE_HABRA_POST, position);
             startActivity(intent);
         }
     }

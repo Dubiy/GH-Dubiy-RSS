@@ -19,11 +19,20 @@ import ua.ck.geekhub.android.dubiy.rssreader.utils.PostLoader;
 
 import static ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder.getPosts;
 
-public class TopicsFragment extends Fragment {
-    private final String LOG_TAG = getClass().getSimpleName();
+public class TopicsFragment extends BaseFragment {
+    private final String LOG_TAG = LOG_TAG_PREFIX + getClass().getSimpleName();
     private ListView listView;
     private OnFragmentInteractionListener mListener;
     private View view;
+
+    public static TopicsFragment newInstance() {
+        TopicsFragment fragment = new TopicsFragment();
+        //Bundle args = new Bundle();
+        //args.putString(ARG_PARAM1, param1);
+        //args.putString(ARG_PARAM2, param2);
+        //fragment.setArguments(args);
+        return fragment;
+    }
 
     public TopicsFragment() {
     }
@@ -35,6 +44,7 @@ public class TopicsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(LOG_TAG, "onCreate");
     }
 
     @Override
@@ -50,6 +60,10 @@ public class TopicsFragment extends Fragment {
 
         if (savedInstanceState == null) {
             refresh_posts();
+            Log.d("GARY"+LOG_TAG, "refresh_posts.");
+        } else {
+            Log.d("GARY"+LOG_TAG, new Integer(this.hashCode()).toString());
+            Log.d("GARY"+LOG_TAG, "savedInstanceState: " + savedInstanceState.toString());
         }
 
         listView.setAdapter(new HabraAdapter(getActivity(), R.layout.habra_list_item, PostHolder.getPosts()));
@@ -82,7 +96,6 @@ public class TopicsFragment extends Fragment {
         PostLoader postLoader = new PostLoader(getActivity(), view);
         postLoader.refresh_posts();
     }
-
 
 
 }

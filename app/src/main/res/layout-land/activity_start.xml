@@ -5,7 +5,12 @@
     android:id="@+id/frags_layout" >
 
     <FrameLayout
-        android:layout_width="match_parent"
+        android:layout_width="150dp"
         android:layout_height="match_parent"
         android:id="@+id/fragment_topics"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment_article"/>
 </LinearLayout>

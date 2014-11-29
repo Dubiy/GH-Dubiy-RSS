@@ -21,15 +21,24 @@ import ua.ck.geekhub.android.dubiy.rssreader.activity.StartActivity;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder;
 
-public class ArticleFragment extends Fragment {
-    private final String LOG_TAG = getClass().getSimpleName();
-    public static final String ARG_ARTICLE_POSITION = ArticleActivity.ARG_ARTICLE_POSITION;
-    private int articlePosition = -1;
+public class ArticleFragment extends BaseFragment {
+    private final String LOG_TAG = LOG_TAG_PREFIX + getClass().getSimpleName();
+    public static final String ARG_ACTIVE_HABRA_POST = "activeHabraPost";
+    private int activeHabraPost = -1;
     private WebView webView;
-
     private OnFragmentInteractionListener mListener;
 
+    public static ArticleFragment newInstance(int activeHabraPost) {
+        Log.d("GARY_ArticleFragment", "newInstance ");
+        ArticleFragment fragment = new ArticleFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_ACTIVE_HABRA_POST, activeHabraPost);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public ArticleFragment() {
+        Log.d(LOG_TAG, "ArticleFragment() constructor");
         // Required empty public constructor
     }
 
@@ -37,9 +46,26 @@ public class ArticleFragment extends Fragment {
         public void onFragmentInteraction(int position);
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(LOG_TAG, "onCreate()");
+        if (getArguments() != null) {
+            activeHabraPost = getArguments().getInt(ARG_ACTIVE_HABRA_POST);
+            Log.d(LOG_TAG, "onCreate getArguments() != null. activeHabraPost: " + activeHabraPost);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(LOG_TAG, "onSaveInstanceState. activeHabraPost: " + activeHabraPost);
+        outState.putInt(ARG_ACTIVE_HABRA_POST, activeHabraPost);
+    }
+
+
     public void loadArticle(int position) {
-        //Toast.makeText(getActivity().getApplicationContext(), "loadArticle " + position, Toast.LENGTH_SHORT).show();
-        articlePosition = position;
+        activeHabraPost = position;
         Log.d(LOG_TAG, "loadArticle(" + position + ")");
         HabraPost post = PostHolder.getPost(position);
         WebSettings webSettings = webView.getSettings();
@@ -47,67 +73,30 @@ public class ArticleFragment extends Fragment {
         webView.loadDataWithBaseURL("", post.getContent(), "text/html", "UTF-8", "");
         if (getActivity().getClass().getSimpleName().equals(ArticleActivity.class.getSimpleName())) {
             getActivity().getActionBar().setTitle(post.getTitle());
-            ListView listView = (ListView)getActivity().findViewById(R.id.left_drawer);
-            listView.setItemChecked(position, true);
-
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getActivity().getApplicationContext());
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt(ARG_ARTICLE_POSITION, position);
-            editor.commit();
-
-            SharedPreferences prefz = PreferenceManager.getDefaultSharedPreferences(this.getActivity().getApplicationContext());
-            Log.d(LOG_TAG, "SharedPreferences pos(" + prefz.getInt(ArticleActivity.ARG_ARTICLE_POSITION, -1) + ")");
         }
 
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(LOG_TAG, "onResume. articlePosition: " + articlePosition);
-        if (articlePosition != -1) {
-            loadArticle(articlePosition);
-        }
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        Bundle args = getActivity().getIntent().getExtras();
-        Log.d(LOG_TAG, "onActivityCreated @@@onStart");
-        if (args != null) {
-            articlePosition = args.getInt(ARG_ARTICLE_POSITION, -1);
-            Log.d(LOG_TAG, "onActivityCreated @@@onStart. articlePosition: " + articlePosition);
-        }
-
-        Log.d(LOG_TAG, "onActivityCreated()");
-        if (savedInstanceState != null) {
-            Log.d(LOG_TAG, "onActivityCreated. savedInstanceState: " + savedInstanceState.toString());
-            int tmpArticlePosition = savedInstanceState.getInt(ARG_ARTICLE_POSITION, -1);
-            Log.d(LOG_TAG, "onActivityCreated. tmpArticlePosition: " + tmpArticlePosition);
-            if (tmpArticlePosition != -1) {
-                articlePosition = tmpArticlePosition;
+        Log.d(LOG_TAG, "onResume. activeHabraPost: " + activeHabraPost);
+        if (activeHabraPost != -1) {
+            loadArticle(activeHabraPost);
+            ListView drawerList = (ListView)getActivity().findViewById(R.id.left_drawer);
+            if (drawerList != null) {
+                Log.d(LOG_TAG, "drawerList != null. activeHabraPost: " + activeHabraPost);
+                drawerList.setItemChecked(activeHabraPost, true);
             }
-            Log.d(LOG_TAG, "onActivityCreated. articlePosition: " + articlePosition);
+            ListView listView = (ListView)getActivity().findViewById(R.id.listView);
+            if (listView != null) {
+                listView.setItemChecked(activeHabraPost, true);
+
+                Log.d(LOG_TAG, "listView != null. activeHabraPost: " + activeHabraPost);
+                Log.d(LOG_TAG, listView.getItemAtPosition(listView.getCheckedItemPosition()).toString());
+            }
+
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(LOG_TAG, "onSaveInstanceState. articlePosition: " + articlePosition);
-        outState.putInt(ARG_ARTICLE_POSITION, articlePosition);
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -119,7 +108,6 @@ public class ArticleFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         webView = (WebView)view.findViewById(R.id.webView);
-
     }
 
     @Override

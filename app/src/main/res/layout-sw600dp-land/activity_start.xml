@@ -4,17 +4,13 @@
     android:orientation="horizontal"
     android:id="@+id/frags_layout" >
 
-    <fragment
+    <FrameLayout
         android:layout_width="@dimen/multipane_leftpane_width"
         android:layout_height="match_parent"
-        android:id="@+id/fragment_topics"
-        android:name="ua.ck.geekhub.android.dubiy.rssreader.fragment.TopicsFragment"
-    />
+        android:id="@+id/fragment_topics"/>
 
-    <fragment
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/fragment_article"
-        android:name="ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment"
-    />
+        android:id="@+id/fragment_article"/>
 </LinearLayout>

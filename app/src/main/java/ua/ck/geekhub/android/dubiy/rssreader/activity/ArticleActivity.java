@@ -1,9 +1,11 @@
 package ua.ck.geekhub.android.dubiy.rssreader.activity;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,9 +18,10 @@ import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder;
 
-public class ArticleActivity extends Activity implements ArticleFragment.OnFragmentInteractionListener {
-    public static final String ARG_ARTICLE_POSITION = "ARTICLE_POSITION";
-    private int articlePosition = -2;
+public class ArticleActivity extends BaseActivity implements ArticleFragment.OnFragmentInteractionListener {
+    private final String LOG_TAG = LOG_TAG_PREFIX + getClass().getSimpleName();
+    public static final String ARG_ACTIVE_HABRA_POST = "activeHabraPost";
+    private int activeHabraPost = -1;
     private DrawerLayout drawerLayout;
     private ListView drawerList;
 
@@ -28,26 +31,38 @@ public class ArticleActivity extends Activity implements ArticleFragment.OnFragm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
 
+        if (savedInstanceState != null) {
+            activeHabraPost = savedInstanceState.getInt(ARG_ACTIVE_HABRA_POST);
+        } else {
+            Bundle extras = getIntent().getExtras();
+            activeHabraPost = extras.getInt(ARG_ACTIVE_HABRA_POST);
+        }
+
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
         drawerList.setAdapter(new HabraAdapter(this, R.layout.habra_list_item, PostHolder.getPosts()));
         drawerList.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView adapterView, View view, int position, long id) {
-                ArticleFragment articleFragment = (ArticleFragment)getFragmentManager().findFragmentById(R.id.fragment_article);
-                articleFragment.loadArticle(position);
+                showArticle(position, true);
                 drawerLayout.closeDrawer(drawerList);
-//                view.
             }
         });
+        drawerList.setItemChecked(activeHabraPost, true);
 
-        /*
-        Intent intent = getIntent();
-        articlePosition = intent.getExtras().getInt(ARG_ARTICLE_POSITION, -3);
-        Toast.makeText(getApplicationContext(), "articlePosition extra " + articlePosition, Toast.LENGTH_LONG).show();
-        */
+        showArticle(activeHabraPost, false);
     }
 
+    private void showArticle(int position, boolean addToBackStack) {
+        activeHabraPost = position;
+        ArticleFragment articleFragment = ArticleFragment.newInstance(position);
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_article, articleFragment);
+        if (addToBackStack) {
+            fragmentTransaction.addToBackStack(null);
+        }
+        fragmentTransaction.commit();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -71,9 +86,11 @@ public class ArticleActivity extends Activity implements ArticleFragment.OnFragm
     @Override
     public void onFragmentInteraction(int position) {
         Toast.makeText(getApplicationContext(), "Fragments interaction (ArticleActivity) " + position, Toast.LENGTH_SHORT).show();
+    }
 
-
-
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(ARG_ACTIVE_HABRA_POST, activeHabraPost);
     }
 }

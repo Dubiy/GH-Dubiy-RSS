@@ -1,18 +1,21 @@
 <resources>
 
-    <!-- Base application theme. -->
     <style name="Theme.Gary" parent="@android:style/Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/ActionBar.Solid.Gary</item>
     </style>
 
     <style name="ActionBar.Solid.Gary" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
         <item name="android:background">@drawable/ab_solid_gary</item>
+        <item name="android:titleTextStyle">@style/Theme.Gary.ActionBar.TitleTextStyle</item>
+    </style>
+
+    <style name="Theme.Gary.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="ListItemStyle">
-        <!-- i dunno how to use it correctly -->
-        <item name="android:fontFamily">sans-serif-condensed</item>
-        <item name="android:textColor">#ffffffff</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">#01579b</item>
         <item name="android:textSize">15dp</item>
     </style>
 

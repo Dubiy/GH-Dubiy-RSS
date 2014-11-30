@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <color name="color_item_bg_active">#FFFFFF</color>
-    <color name="color_item_bg_pressed">#CACACA</color>
-    <color name="color_item_bg_selected">#CACACA</color>
-    <color name="color_left_sidebar">#2c5b7f</color>
+    <color name="color_item_bg_active">#4dbce9</color>
+    <color name="color_item_bg_pressed">#26ade4</color>
+    <color name="color_item_bg_selected">#26ade4</color>
+    <color name="color_left_sidebar">#0099cc</color>
+    <!--<color name="color_left_sidebar">#2c5b7f</color>-->
 
-    <color name="color_item_title_active">#2c5b7f</color>
-    <color name="color_item_title_pressed">#777777</color>
-    <color name="color_item_title_selected">#777777</color>
-    <color name="color_item_title">#EDEDED</color>
+    <color name="color_item_title_active">#000000</color>
+    <color name="color_item_title_pressed">#ffffff</color>
+    <color name="color_item_title_selected">#ffffff</color>
+    <color name="color_item_title">#ffffff</color>
 
-    <color name="color_item_subtitle_active">#CC2D5C7D</color>
-    <color name="color_item_subtitle_pressed">#777777</color>
-    <color name="color_item_subtitle_selected">#777777</color>
-    <color name="color_item_subtitle">#ccededed</color>
+    <color name="color_item_subtitle_active">#99000000</color>
+    <color name="color_item_subtitle_pressed">#ffffff</color>
+    <color name="color_item_subtitle_selected">#ffffff</color>
+    <color name="color_item_subtitle">#99ffffff</color>
 
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>

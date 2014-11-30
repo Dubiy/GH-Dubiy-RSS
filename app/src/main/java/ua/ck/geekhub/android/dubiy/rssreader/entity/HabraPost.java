@@ -2,7 +2,9 @@ package ua.ck.geekhub.android.dubiy.rssreader.entity;
 
 import java.util.ArrayList;
 
-public class HabraPost {
+import ua.ck.geekhub.android.dubiy.rssreader.utils.BaseClass;
+
+public class HabraPost extends BaseClass {
     private String title;
     private String link;
     private String publishDate;

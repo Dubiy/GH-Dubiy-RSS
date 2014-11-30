@@ -46,7 +46,6 @@ public class TopicsFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(LOG_TAG, "onCreate");
     }
 
     @Override
@@ -62,10 +61,6 @@ public class TopicsFragment extends BaseFragment {
 
         if (savedInstanceState == null) {
             refresh_posts();
-            Log.d("GARY"+LOG_TAG, "refresh_posts.");
-        } else {
-            Log.d("GARY"+LOG_TAG, new Integer(this.hashCode()).toString());
-            Log.d("GARY"+LOG_TAG, "savedInstanceState: " + savedInstanceState.toString());
         }
 
 //        listView.setAdapter(new HabraAdapter(getActivity(), R.layout.habra_list_item, PostHolder.getPosts()));
@@ -95,7 +90,6 @@ public class TopicsFragment extends BaseFragment {
     }
 
     public void refresh_posts() {
-        //Log.d(LOG_TAG, "refresh_posts() fragment");
         PostLoader postLoader = new PostLoader(getActivity(), view);
         postLoader.refresh_posts();
     }

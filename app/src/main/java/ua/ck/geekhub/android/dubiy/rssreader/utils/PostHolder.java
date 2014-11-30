@@ -9,7 +9,7 @@ import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
 /**
  * Created by Gary on 23.11.2014.
  */
-public class PostHolder {
+public class PostHolder extends BaseClass {
 //    private static HabraPost[] posts = {};
     private static ArrayList<HabraPost> habraPosts = new ArrayList<HabraPost>();
     private static long lastUpdate = 0;

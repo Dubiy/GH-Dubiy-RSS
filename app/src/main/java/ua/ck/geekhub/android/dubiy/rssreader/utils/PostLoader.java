@@ -3,9 +3,7 @@ package ua.ck.geekhub.android.dubiy.rssreader.utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -18,7 +16,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
@@ -27,8 +24,7 @@ import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
 /**
  * Created by Gary on 23.11.2014.
  */
-public class PostLoader {
-    private final String LOG_TAG = getClass().getSimpleName();
+public class PostLoader extends BaseClass {
     private Context context;
     private View view;
     private String url;
@@ -39,7 +35,6 @@ public class PostLoader {
     }
 
     public PostLoader(Context context, View view) {
-        //Log.d(LOG_TAG, "PostLoader constructor");
         this.context = context;
         this.view = view;
         url = context.getResources().getString(R.string.url);
@@ -47,7 +42,6 @@ public class PostLoader {
     }
 
     public boolean refresh_posts() {
-        //Log.d(LOG_TAG, "refresh_posts started");
 
 
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -65,7 +59,6 @@ public class PostLoader {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    //Log.d("TEST", "in thread...");
                     DefaultHttpClient client = new DefaultHttpClient();
                     HttpGet httpGet = new HttpGet(url);
                     try {

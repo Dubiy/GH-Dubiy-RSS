@@ -60,7 +60,6 @@ public class ArticleFragment extends BaseFragment {
 
     public void loadArticle(int position) {
         activeHabraPost = position;
-        Log.d(LOG_TAG, "loadArticle(" + position + ")");
 
         if (position != -1) {
             HabraPost post = PostHolder.getPost(position);

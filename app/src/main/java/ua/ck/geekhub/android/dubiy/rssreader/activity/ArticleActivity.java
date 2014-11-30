@@ -109,7 +109,6 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh: {
-                Log.d(LOG_TAG, "menu Refresh");
                 PostLoader postLoader = new PostLoader(this, drawerLayout);
                 postLoader.refresh_posts();
             }
@@ -122,8 +121,6 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
                 intent.putExtra(android.content.Intent.EXTRA_SUBJECT, habraPost.getTitle());
                 startActivity(Intent.createChooser(intent, "Share"));
             } break;
-
-
             default: {
                 return super.onOptionsItemSelected(item);
             }

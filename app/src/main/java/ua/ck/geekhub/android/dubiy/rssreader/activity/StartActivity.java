@@ -1,24 +1,23 @@
 package ua.ck.geekhub.android.dubiy.rssreader.activity;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
+import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.TopicsFragment;
+import ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder;
 
 
 public class StartActivity extends BaseActivity implements TopicsFragment.OnFragmentInteractionListener, ArticleFragment.OnFragmentInteractionListener {
-    private final String LOG_TAG = LOG_TAG_PREFIX + getClass().getSimpleName();
+
     private boolean isMultiPanel;
 
     @Override
@@ -55,40 +54,7 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
     protected void onResume() {
         super.onResume();
         isMultiPanel = findViewById(R.id.fragment_article) != null;
-        Log.d(LOG_TAG, "onResume. isMultiPanel: " + isMultiPanel);
-
-        /**
-         * ПЕРЕПИСАТЬ
-         * */
-
-/*
-        topicsFragment = (TopicsFragment) getFragmentManager().findFragmentById(R.id.fragment_topics);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-        int position = prefs.getInt(ArticleActivity.ARG_ARTICLE_POSITION, -1);
-        //WTF!? o_O
-        //коли повертається на цю актівіті з альбомної орієнтації, то в SharedPreferences ПУСТО!!!
-
-        if (position != -1) {
-            Log.d(LOG_TAG, "pos == " + position);
-
-            if (topicsFragment != null) {
-                ListView listView = (ListView) findViewById(R.id.listView);
-                Log.d(LOG_TAG, "setItemChecked" + position);
-                listView.setItemChecked(position, true);
-            }
-
-            ArticleFragment articleFragment = (ArticleFragment) getFragmentManager().findFragmentById(R.id.fragment_article);
-            if (articleFragment != null) {
-                try {
-                    articleFragment.loadArticle(position);
-                } catch (Exception e) {
-                    Log.d(LOG_TAG, "articleFragment != null");
-                    e.printStackTrace();
-                }
-            }
-
-
-        }*/
+        invalidateOptionsMenu();
     }
 
     @Override
@@ -98,23 +64,38 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        /**
-         *  НАПИСАТЬ КОД ТУТ!
-         * */
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // Called whenever we call invalidateOptionsMenu()
+        menu.findItem(R.id.action_share).setVisible(isMultiPanel);
+        return super.onPrepareOptionsMenu(menu);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings: {
-                Log.d(LOG_TAG, "menu Settings");
+            case R.id.action_about: {
+                aboutAuthor();
             }
             break;
             case R.id.action_refresh: {
-                Log.d(LOG_TAG, "menu Refresh");
                 FragmentManager fragmentManager = getFragmentManager();
                 TopicsFragment topicsFragment = (TopicsFragment)fragmentManager.findFragmentById(R.id.fragment_topics);
                 topicsFragment.refresh_posts();
             }
             break;
+            case R.id.action_share: {
+                int activeHabraPost = -1;
+                ListView listView = (ListView) findViewById(R.id.listView);
+                if (listView != null) {
+                    activeHabraPost = listView.getCheckedItemPosition();
+                }
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                HabraPost habraPost = PostHolder.getPost(activeHabraPost);
+                intent.putExtra(Intent.EXTRA_TEXT, habraPost.getLink());
+                intent.putExtra(android.content.Intent.EXTRA_SUBJECT, habraPost.getTitle());
+                startActivity(Intent.createChooser(intent, "Share"));
+            } break;
             default: {
                 return super.onOptionsItemSelected(item);
             }
@@ -126,7 +107,6 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
 
     @Override
     public void onFragmentInteraction(int position) {
-        Log.d(LOG_TAG, "onFragmentInteraction. isMultiPanel: " + isMultiPanel + ". position: " + position);
         if (isMultiPanel) {
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             ArticleFragment articleFragment = ArticleFragment.newInstance(position);

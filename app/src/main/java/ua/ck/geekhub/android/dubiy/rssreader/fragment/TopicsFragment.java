@@ -23,7 +23,6 @@ import ua.ck.geekhub.android.dubiy.rssreader.utils.PostLoader;
 import static ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder.getPosts;
 
 public class TopicsFragment extends BaseFragment {
-    private final String LOG_TAG = LOG_TAG_PREFIX + getClass().getSimpleName();
     private ListView listView;
     private OnFragmentInteractionListener mListener;
     private View view;

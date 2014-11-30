@@ -26,5 +26,9 @@
 
     <string name="title_activity_article">ArticleActivity</string>
     <string name="action_refresh">Refresh</string>
+    <string name="action_share">Share</string>
+    <string name="goto_site">Creator site</string>
+    <string name="author_site">http://garik.pp.ua</string>
+    <string name="action_about">About</string>
 
 </resources>

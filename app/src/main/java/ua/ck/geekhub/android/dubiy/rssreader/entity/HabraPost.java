@@ -10,11 +10,11 @@ public class HabraPost {
     private String content;
 
     public HabraPost() {
-        this.title = "ttl";
-        this.link = "lnk";
-        this.publishDate = "pblshDt";
-        this.shortContent = "shrtCntnt";
-        this.content = "cntnt";
+        this.title = "HabraReader";
+        this.link = "http://garik.pp.ua";
+        this.publishDate = "";
+        this.shortContent = "";
+        this.content = "";
     }
 
     @Override

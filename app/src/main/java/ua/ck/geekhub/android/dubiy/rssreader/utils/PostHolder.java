@@ -1,5 +1,7 @@
 package ua.ck.geekhub.android.dubiy.rssreader.utils;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
@@ -22,8 +24,11 @@ public class PostHolder {
     }
 
     public static HabraPost getPost(int position) {
-        return PostHolder.habraPosts.get(position);
-
+        if (position != -1) {
+            return PostHolder.habraPosts.get(position);
+        } else {
+            return new HabraPost();
+        }
     }
 
     public static boolean needUpdate() {

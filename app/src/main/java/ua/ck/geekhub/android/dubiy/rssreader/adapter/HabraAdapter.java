@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
@@ -27,7 +28,7 @@ public class HabraAdapter extends ArrayAdapter {
     private int layoutResourceId;
     private HabraPost data[] = null;
     private LayoutInflater inflater;
-    private SimpleDateFormat simpleDateFormat;
+    private SimpleDateFormat resultDateFormat;
     private SimpleDateFormat parseDateFormat;
     private List<HabraPost> habraPosts;
 
@@ -37,8 +38,8 @@ public class HabraAdapter extends ArrayAdapter {
         this.mContext = mContext;
         this.habraPosts = habraPosts;
         inflater = ((Activity) mContext).getLayoutInflater();
-        simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss");
-        parseDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss zzz");
+        parseDateFormat = new SimpleDateFormat("E, dd MMM yyyy kk:mm:ss z", Locale.ENGLISH);
+        resultDateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss");
     }
 
     @Override
@@ -84,18 +85,14 @@ public class HabraAdapter extends ArrayAdapter {
         holder.title.setText(habraPost.getTitle());
 
         try {
-            Date parsedDate = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").parse(habraPost.getPublishDate());
-            holder.date.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(parsedDate));
+            Date parsedDate = parseDateFormat.parse(habraPost.getPublishDate());
+            holder.date.setText(resultDateFormat.format(parsedDate));
         } catch (ParseException e) {
             holder.date.setText(habraPost.getPublishDate());
-            //Toast.makeText(convertView.getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
         return convertView;
-
     }
-
-
 
     @Override
     public void notifyDataSetChanged() {

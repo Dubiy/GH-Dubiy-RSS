@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -20,19 +21,22 @@ import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder;
+import ua.ck.geekhub.android.dubiy.rssreader.utils.PostLoader;
 
 public class ArticleActivity extends BaseActivity implements ArticleFragment.OnFragmentInteractionListener {
-    private final String LOG_TAG = LOG_TAG_PREFIX + getClass().getSimpleName();
     public static final String ARG_ACTIVE_HABRA_POST = "activeHabraPost";
     private int activeHabraPost = -1;
     private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
     private ListView drawerList;
+    private String tmpActionBarTitle;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
+
 
         if (savedInstanceState != null) {
             activeHabraPost = savedInstanceState.getInt(ARG_ACTIVE_HABRA_POST);
@@ -52,6 +56,24 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
             }
         });
         drawerList.setItemChecked(activeHabraPost, true);
+
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.drawable.ic_drawer, R.string.app_name, R.string.app_name) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                tmpActionBarTitle = (String) getActionBar().getTitle();
+                getActionBar().setTitle(R.string.app_name);
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                getActionBar().setTitle(tmpActionBarTitle);
+                invalidateOptionsMenu();
+            }
+        };
+        drawerLayout.setDrawerListener(drawerToggle);
 
         showArticle(activeHabraPost, false);
     }
@@ -75,15 +97,38 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // Called whenever we call invalidateOptionsMenu()
+        boolean drawerOpen = drawerLayout.isDrawerOpen(drawerList);
+        menu.findItem(R.id.action_refresh).setVisible(drawerOpen);
+        menu.findItem(R.id.action_share).setVisible( ! drawerOpen);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_refresh: {
+                Log.d(LOG_TAG, "menu Refresh");
+                PostLoader postLoader = new PostLoader(this, drawerLayout);
+                postLoader.refresh_posts();
+            }
+            break;
+            case R.id.action_share: {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                HabraPost habraPost = PostHolder.getPost(activeHabraPost);
+                intent.putExtra(Intent.EXTRA_TEXT, habraPost.getLink());
+                intent.putExtra(android.content.Intent.EXTRA_SUBJECT, habraPost.getTitle());
+                startActivity(Intent.createChooser(intent, "Share"));
+            } break;
+
+
+            default: {
+                return super.onOptionsItemSelected(item);
+            }
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     @Override

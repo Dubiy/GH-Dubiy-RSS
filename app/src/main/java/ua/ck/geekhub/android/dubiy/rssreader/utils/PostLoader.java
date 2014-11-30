@@ -74,29 +74,25 @@ public class PostLoader {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray entries = jsonObject.getJSONObject("responseData").getJSONObject("feed").getJSONArray("entries");
                         int entries_count = entries.length();
-                        final HabraPost[] posts = new HabraPost[entries_count];
                         for (int i = 0; i < entries_count; i++) {
-                            posts[i] = new HabraPost();
-
-                            posts[i].setTitle(entries.getJSONObject(i).getString("title"));
-                            posts[i].setLink(entries.getJSONObject(i).getString("link"));
-                            posts[i].setPublishDate(entries.getJSONObject(i).getString("publishedDate"));
-                            posts[i].setShortContent(entries.getJSONObject(i).getString("contentSnippet"));
-                            posts[i].setContent(entries.getJSONObject(i).getString("content"));
-
-                            habraPosts.add(posts[i]);
-
+                            HabraPost tmp_post = new HabraPost();
+                            tmp_post.setTitle(entries.getJSONObject(i).getString("title"));
+                            tmp_post.setLink(entries.getJSONObject(i).getString("link"));
+                            tmp_post.setPublishDate(entries.getJSONObject(i).getString("publishedDate"));
+                            tmp_post.setShortContent(entries.getJSONObject(i).getString("contentSnippet"));
+                            tmp_post.setContent(entries.getJSONObject(i).getString("content"));
+                            habraPosts.add(tmp_post);
                         }
-//
-                        Log.d("GARY_OK", "mHabraPosts.size: " + new Integer(habraPosts.size()).toString());
                         PostHolder.setPosts(habraPosts);
 
                         view.post(new Runnable() {
                             @Override
                             public void run() {
-                                Log.d("GARY_OK", "Refresh finished");
                                 ListView listView = (ListView) view.findViewById(R.id.listView);
-                                HabraAdapter habraAdapter = (HabraAdapter) ((ListView)listView).getAdapter();
+                                if (listView == null) {
+                                    listView = (ListView) view.findViewById(R.id.left_drawer);
+                                }
+                                HabraAdapter habraAdapter = (HabraAdapter) listView.getAdapter();
                                 if (habraAdapter != null) {
                                     habraAdapter.clear();
                                     habraAdapter.notifyDataSetChanged();

@@ -22,7 +22,6 @@ import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder;
 
 public class ArticleFragment extends BaseFragment {
-    private final String LOG_TAG = LOG_TAG_PREFIX + getClass().getSimpleName();
     public static final String ARG_ACTIVE_HABRA_POST = "activeHabraPost";
     private int activeHabraPost = -1;
     private WebView webView;

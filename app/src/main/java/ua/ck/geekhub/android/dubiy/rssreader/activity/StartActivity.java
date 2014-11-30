@@ -23,10 +23,6 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        //TODO вставить сюди перевірку чи TopicsFragment вже існує. щоб не перестворювати його заново
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
@@ -37,14 +33,9 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
         fragmentTransaction.replace(R.id.fragment_topics, topicsFragment);
 
         if (isMultiPanel) {
-            //TODO show default Article here. maybe app info, or short help
             ArticleFragment articleFragment = new ArticleFragment();
             fragmentTransaction.replace(R.id.fragment_article, articleFragment);
         }
-
-        //create frsagments here
-        //if article frag here, load empty frag
-
         fragmentTransaction.commit();
     }
 
@@ -119,7 +110,9 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
             break;
             case R.id.action_refresh: {
                 Log.d(LOG_TAG, "menu Refresh");
-                //topicsFragment.refresh_posts();
+                FragmentManager fragmentManager = getFragmentManager();
+                TopicsFragment topicsFragment = (TopicsFragment)fragmentManager.findFragmentById(R.id.fragment_topics);
+                topicsFragment.refresh_posts();
             }
             break;
             default: {

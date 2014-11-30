@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
@@ -28,15 +29,35 @@ public class HabraAdapter extends ArrayAdapter {
     private LayoutInflater inflater;
     private SimpleDateFormat simpleDateFormat;
     private SimpleDateFormat parseDateFormat;
+    private List<HabraPost> habraPosts;
 
-    public HabraAdapter(Context mContext, int layoutResourceId, HabraPost[] data) {
-        super(mContext, layoutResourceId, data);
+    public HabraAdapter(Context mContext, int layoutResourceId, List<HabraPost> habraPosts) {
+        super(mContext, layoutResourceId, habraPosts);
         this.layoutResourceId = layoutResourceId;
         this.mContext = mContext;
-        this.data = data;
+        this.habraPosts = habraPosts;
         inflater = ((Activity) mContext).getLayoutInflater();
         simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss");
         parseDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss zzz");
+    }
+
+    @Override
+    public int getCount() {
+        return habraPosts.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return habraPosts.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    public HabraPost getHabraPost (int position) {
+        return (HabraPost) getItem(position);
     }
 
     static class ViewHolder {
@@ -59,15 +80,14 @@ public class HabraAdapter extends ArrayAdapter {
             holder = (ViewHolder)convertView.getTag();
         }
 
-        holder.title.setText(data[position].getTitle());
+        HabraPost habraPost = getHabraPost(position);
+        holder.title.setText(habraPost.getTitle());
 
         try {
-//            Date parsedDate = parseDateFormat.parse(data[position].getPublishDate());
-//            holder.date.setText(simpleDateFormat.format(parsedDate));
-            Date parsedDate = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").parse(data[position].getPublishDate());
+            Date parsedDate = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").parse(habraPost.getPublishDate());
             holder.date.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(parsedDate));
         } catch (ParseException e) {
-            holder.date.setText(data[position].getPublishDate());
+            holder.date.setText(habraPost.getPublishDate());
             //Toast.makeText(convertView.getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
@@ -80,10 +100,6 @@ public class HabraAdapter extends ArrayAdapter {
     @Override
     public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
-
-        Log.d("TEST", "notifyDataSetChanged()" + data.length);
-
-
     }
 }
 

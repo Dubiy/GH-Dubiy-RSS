@@ -17,6 +17,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
@@ -32,6 +33,7 @@ public class PostLoader {
     private View view;
     private String url;
     private ProgressBar progressBar;
+    private ArrayList<HabraPost> habraPosts = new ArrayList<HabraPost>();
 
     public PostLoader() {
     }
@@ -46,6 +48,7 @@ public class PostLoader {
 
     public boolean refresh_posts() {
         //Log.d(LOG_TAG, "refresh_posts started");
+
 
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
@@ -80,19 +83,27 @@ public class PostLoader {
                             posts[i].setPublishDate(entries.getJSONObject(i).getString("publishedDate"));
                             posts[i].setShortContent(entries.getJSONObject(i).getString("contentSnippet"));
                             posts[i].setContent(entries.getJSONObject(i).getString("content"));
+
+                            habraPosts.add(posts[i]);
+
                         }
 //
-                        PostHolder.setPosts(posts);
+                        Log.d("GARY_OK", "mHabraPosts.size: " + new Integer(habraPosts.size()).toString());
+                        PostHolder.setPosts(habraPosts);
+
                         view.post(new Runnable() {
                             @Override
                             public void run() {
-                                Log.d(LOG_TAG, "Refresh finished");
+                                Log.d("GARY_OK", "Refresh finished");
                                 ListView listView = (ListView) view.findViewById(R.id.listView);
-                                //((ArrayAdapter)listView.getAdapter()).notifyDataSetChanged();
-                                //((HabraAdapter)listView.getAdapter()).replaceData(PostHolder.getPosts());
-
+                                HabraAdapter habraAdapter = (HabraAdapter) ((ListView)listView).getAdapter();
+                                if (habraAdapter != null) {
+                                    habraAdapter.clear();
+                                    habraAdapter.notifyDataSetChanged();
+                                    habraAdapter.addAll(habraPosts);
+                                    habraAdapter.notifyDataSetChanged();
+                                }
                                 int checkedItemPosition = listView.getCheckedItemPosition();
-                                listView.setAdapter(new HabraAdapter(context, R.layout.habra_list_item, PostHolder.getPosts()));
                                 listView.setItemChecked(checkedItemPosition , true);
                                 progressBar.setVisibility(View.GONE);
                             }

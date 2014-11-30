@@ -29,7 +29,6 @@ public class ArticleFragment extends BaseFragment {
     private OnFragmentInteractionListener mListener;
 
     public static ArticleFragment newInstance(int activeHabraPost) {
-        Log.d("GARY_ArticleFragment", "newInstance ");
         ArticleFragment fragment = new ArticleFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_ACTIVE_HABRA_POST, activeHabraPost);
@@ -38,7 +37,6 @@ public class ArticleFragment extends BaseFragment {
     }
 
     public ArticleFragment() {
-        Log.d(LOG_TAG, "ArticleFragment() constructor");
         // Required empty public constructor
     }
 
@@ -49,17 +47,14 @@ public class ArticleFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(LOG_TAG, "onCreate()");
         if (getArguments() != null) {
             activeHabraPost = getArguments().getInt(ARG_ACTIVE_HABRA_POST);
-            Log.d(LOG_TAG, "onCreate getArguments() != null. activeHabraPost: " + activeHabraPost);
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d(LOG_TAG, "onSaveInstanceState. activeHabraPost: " + activeHabraPost);
         outState.putInt(ARG_ACTIVE_HABRA_POST, activeHabraPost);
     }
 
@@ -67,35 +62,32 @@ public class ArticleFragment extends BaseFragment {
     public void loadArticle(int position) {
         activeHabraPost = position;
         Log.d(LOG_TAG, "loadArticle(" + position + ")");
-        HabraPost post = PostHolder.getPost(position);
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webView.loadDataWithBaseURL("", post.getContent(), "text/html", "UTF-8", "");
-        if (getActivity().getClass().getSimpleName().equals(ArticleActivity.class.getSimpleName())) {
-            getActivity().getActionBar().setTitle(post.getTitle());
+
+        if (position != -1) {
+            HabraPost post = PostHolder.getPost(position);
+            webView.loadDataWithBaseURL("", post.getContent(), "text/html", "UTF-8", "");
+            if (getActivity().getClass().getSimpleName().equals(ArticleActivity.class.getSimpleName())) {
+                getActivity().getActionBar().setTitle(post.getTitle());
+            }
+        } else {
+            webView.loadUrl("file:///android_asset/short_info.html");
+//            webView.loadDataWithBaseURL("", "hahaha, hello", "text/html", "UTF-8", "");
         }
+
 
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(LOG_TAG, "onResume. activeHabraPost: " + activeHabraPost);
-        if (activeHabraPost != -1) {
-            loadArticle(activeHabraPost);
-            ListView drawerList = (ListView)getActivity().findViewById(R.id.left_drawer);
-            if (drawerList != null) {
-                Log.d(LOG_TAG, "drawerList != null. activeHabraPost: " + activeHabraPost);
-                drawerList.setItemChecked(activeHabraPost, true);
-            }
-            ListView listView = (ListView)getActivity().findViewById(R.id.listView);
-            if (listView != null) {
-                listView.setItemChecked(activeHabraPost, true);
-
-                Log.d(LOG_TAG, "listView != null. activeHabraPost: " + activeHabraPost);
-                Log.d(LOG_TAG, listView.getItemAtPosition(listView.getCheckedItemPosition()).toString());
-            }
-
+        loadArticle(activeHabraPost);
+        ListView drawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
+        if (drawerList != null) {
+            drawerList.setItemChecked(activeHabraPost, true);
+        }
+        ListView listView = (ListView) getActivity().findViewById(R.id.listView);
+        if (listView != null) {
+            listView.setItemChecked(activeHabraPost, true);
         }
     }
 
@@ -107,7 +99,9 @@ public class ArticleFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        webView = (WebView)view.findViewById(R.id.webView);
+        webView = (WebView) view.findViewById(R.id.webView);
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
     }
 
     @Override

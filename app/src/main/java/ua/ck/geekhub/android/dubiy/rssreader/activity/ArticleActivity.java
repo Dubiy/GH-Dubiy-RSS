@@ -13,8 +13,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
+import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder;
 

@@ -11,9 +11,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.adapter.ArrayAdapterItem;
 import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
+import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostLoader;
 
@@ -66,6 +69,7 @@ public class TopicsFragment extends BaseFragment {
             Log.d("GARY"+LOG_TAG, "savedInstanceState: " + savedInstanceState.toString());
         }
 
+//        listView.setAdapter(new HabraAdapter(getActivity(), R.layout.habra_list_item, PostHolder.getPosts()));
         listView.setAdapter(new HabraAdapter(getActivity(), R.layout.habra_list_item, PostHolder.getPosts()));
         listView.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override

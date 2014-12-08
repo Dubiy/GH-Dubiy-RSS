@@ -2,17 +2,26 @@ package ua.ck.geekhub.android.dubiy.rssreader.activity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
+import android.renderscript.RenderScript;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import java.sql.Time;
+import java.util.Random;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.TopicsFragment;
+import ua.ck.geekhub.android.dubiy.rssreader.service.RefreshPostsService;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder;
 
 
@@ -24,6 +33,9 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+
+        Intent intent = new Intent(this, RefreshPostsService.class);
+        startService(intent);
 
         isMultiPanel = findViewById(R.id.fragment_article) != null;
 
@@ -41,13 +53,16 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
     @Override
     public void onBackPressed() {
         Log.d(LOG_TAG, "onBackPressed. isMultiPanel: " + isMultiPanel);
+        FragmentManager fragmentManager = getFragmentManager();
         if ( ! isMultiPanel) {
-            FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
+        if (fragmentManager.getBackStackEntryCount() == 0) {
+            Intent intent = new Intent(this, RefreshPostsService.class);
+            stopService(intent);
+        }
+
         super.onBackPressed();
-
-
     }
 
     @Override
@@ -77,6 +92,30 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
                 aboutAuthor();
             }
             break;
+            case R.id.action_notify: {
+
+//                long[] vibrate = {100, 150, 0, 400, 0, 900, 0, 9978979};
+
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).
+                        setSmallIcon(R.drawable.ic_launcher).
+                        setContentTitle("Hello, megaMAN!").
+                        setContentText("wou! Wou, baby!").
+                        setAutoCancel(true).
+                        setProgress(100, 35, false).
+                        setPriority(NotificationCompat.PRIORITY_DEFAULT).
+                        setLights(android.R.color.holo_green_light, 500, 500);
+//                        setVibrate(vibrate);
+
+                Intent resultIntent = new Intent(this, ArticleActivity.class);
+                PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0,resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                mBuilder.setContentIntent(resultPendingIntent);
+
+                int mNotificationId = 1;
+                NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                mNotificationManager.notify(mNotificationId, mBuilder.build());
+
+
+            } break;
             case R.id.action_refresh: {
                 FragmentManager fragmentManager = getFragmentManager();
                 TopicsFragment topicsFragment = (TopicsFragment)fragmentManager.findFragmentById(R.id.fragment_topics);

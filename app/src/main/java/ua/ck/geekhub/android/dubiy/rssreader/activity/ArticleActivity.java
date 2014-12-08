@@ -42,7 +42,11 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
             activeHabraPost = savedInstanceState.getInt(ARG_ACTIVE_HABRA_POST);
         } else {
             Bundle extras = getIntent().getExtras();
-            activeHabraPost = extras.getInt(ARG_ACTIVE_HABRA_POST);
+            if (extras != null) {
+                activeHabraPost = extras.getInt(ARG_ACTIVE_HABRA_POST);
+            } else {
+                Log.d(LOG_TAG, "EMPTY EXTRAZ. MAYBE IT'S NotIFY");
+            }
         }
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);

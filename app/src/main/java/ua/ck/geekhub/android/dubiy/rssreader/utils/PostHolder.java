@@ -25,10 +25,20 @@ public class PostHolder extends BaseClass {
 
     public static HabraPost getPost(int position) {
         if (position != -1) {
-            return PostHolder.habraPosts.get(position);
+            if (PostHolder.habraPosts.size() > 0) {
+                return PostHolder.habraPosts.get(position);
+            } else {
+                return null;
+            }
         } else {
             return new HabraPost();
         }
+    }
+
+    public static void addPost(HabraPost habraPost) {
+
+        PostHolder.habraPosts.add(habraPost);
+        PostHolder.habraPosts.set(0, habraPost);
     }
 
     public static boolean needUpdate() {

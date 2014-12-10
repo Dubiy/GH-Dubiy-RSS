@@ -34,12 +34,19 @@ public class PostLoader extends BaseClass {
     public PostLoader() {
     }
 
+    public PostLoader(Context context) {
+        this.context = context;
+        this.view = null;
+        url = context.getResources().getString(R.string.url);
+    }
+
     public PostLoader(Context context, View view) {
         this.context = context;
         this.view = view;
         url = context.getResources().getString(R.string.url);
 
     }
+
 
     public boolean refresh_posts() {
 
@@ -53,9 +60,10 @@ public class PostLoader extends BaseClass {
         }
 
         if (PostHolder.needUpdate()) {
-//            view.findViewById(R.id.loading_indicator)
-            progressBar = (ProgressBar) view.findViewById(R.id.loading_indicator);
-            progressBar.setVisibility(View.VISIBLE);
+            if (view != null) {
+                progressBar = (ProgressBar) view.findViewById(R.id.loading_indicator);
+                progressBar.setVisibility(View.VISIBLE);
+            }
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -78,25 +86,27 @@ public class PostLoader extends BaseClass {
                         }
                         PostHolder.setPosts(habraPosts);
 
-                        view.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                ListView listView = (ListView) view.findViewById(R.id.listView);
-                                if (listView == null) {
-                                    listView = (ListView) view.findViewById(R.id.left_drawer);
+                        if (view != null) {
+                            view.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ListView listView = (ListView) view.findViewById(R.id.listView);
+                                    if (listView == null) {
+                                        listView = (ListView) view.findViewById(R.id.left_drawer);
+                                    }
+                                    HabraAdapter habraAdapter = (HabraAdapter) listView.getAdapter();
+                                    if (habraAdapter != null) {
+                                        habraAdapter.clear();
+                                        habraAdapter.notifyDataSetChanged();
+                                        habraAdapter.addAll(habraPosts);
+                                        habraAdapter.notifyDataSetChanged();
+                                    }
+                                    int checkedItemPosition = listView.getCheckedItemPosition();
+                                    listView.setItemChecked(checkedItemPosition, true);
+                                    progressBar.setVisibility(View.GONE);
                                 }
-                                HabraAdapter habraAdapter = (HabraAdapter) listView.getAdapter();
-                                if (habraAdapter != null) {
-                                    habraAdapter.clear();
-                                    habraAdapter.notifyDataSetChanged();
-                                    habraAdapter.addAll(habraPosts);
-                                    habraAdapter.notifyDataSetChanged();
-                                }
-                                int checkedItemPosition = listView.getCheckedItemPosition();
-                                listView.setItemChecked(checkedItemPosition , true);
-                                progressBar.setVisibility(View.GONE);
-                            }
-                        });
+                            });
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

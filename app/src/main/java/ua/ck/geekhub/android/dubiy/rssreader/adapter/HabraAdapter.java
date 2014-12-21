@@ -62,6 +62,7 @@ public class HabraAdapter extends ArrayAdapter {
     }
 
     static class ViewHolder {
+        TextView itemId;
         TextView title;
         TextView date;
     }
@@ -74,6 +75,7 @@ public class HabraAdapter extends ArrayAdapter {
             convertView = inflater.inflate(layoutResourceId, parent, false);
 
             holder = new ViewHolder();
+            holder.itemId = (TextView)convertView.findViewById(R.id.textViewItemId);
             holder.title = (TextView)convertView.findViewById(R.id.textViewTitle);
             holder.date = (TextView)convertView.findViewById(R.id.textViewDate);
             convertView.setTag(holder);
@@ -83,14 +85,8 @@ public class HabraAdapter extends ArrayAdapter {
 
         HabraPost habraPost = getHabraPost(position);
         holder.title.setText(habraPost.getTitle());
-
-        try {
-            Date parsedDate = parseDateFormat.parse(habraPost.getPublishDate());
-            holder.date.setText(resultDateFormat.format(parsedDate));
-        } catch (ParseException e) {
-            holder.date.setText(habraPost.getPublishDate());
-            e.printStackTrace();
-        }
+        holder.itemId.setText(String.valueOf(habraPost.getId()));
+        holder.date.setText(resultDateFormat.format(habraPost.getDate()));
         return convertView;
     }
 

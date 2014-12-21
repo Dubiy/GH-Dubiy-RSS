@@ -1,40 +1,28 @@
 package ua.ck.geekhub.android.dubiy.rssreader.fragment;
 
 import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.activity.ArticleActivity;
-import ua.ck.geekhub.android.dubiy.rssreader.activity.StartActivity;
-import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
-import ua.ck.geekhub.android.dubiy.rssreader.database.PostTable;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
-import ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder;
 
 public class ArticleFragment extends BaseFragment {
-    public static final String ARG_ACTIVE_HABRA_POST = "activeHabraPost";
-    private int activeHabraPost = -1;
+    public static final String ARG_POST_ID = "postId";
+    private long postId = -1;
     private WebView webView;
     private OnFragmentInteractionListener mListener;
 
-    public static ArticleFragment newInstance(int activeHabraPost) {
+    public static ArticleFragment newInstance(long postId) {
         ArticleFragment fragment = new ArticleFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_ACTIVE_HABRA_POST, activeHabraPost);
+        args.putLong(ARG_POST_ID, postId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -44,59 +32,65 @@ public class ArticleFragment extends BaseFragment {
     }
 
     public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(int position);
+        public void onFragmentInteraction(long postId);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            activeHabraPost = getArguments().getInt(ARG_ACTIVE_HABRA_POST);
+            postId = getArguments().getLong(ARG_POST_ID);
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(ARG_ACTIVE_HABRA_POST, activeHabraPost);
+        outState.putLong(ARG_POST_ID, postId);
     }
 
 
-    public void loadArticle(int position) {
+    public void loadArticle(long id) {
+        postId = id;
 
-        DBHelper dbHelper = DBHelper.getInstance(getActivity());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Log.d(LOG_TAG, "db: " + db.hashCode() + ". helper: " + dbHelper.hashCode());
+        if (postId != -1) {
 
-
-        activeHabraPost = position;
-
-        if (position != -1) {
-            HabraPost post = PostHolder.getPost(position);
-            webView.loadDataWithBaseURL("", post.getContent(), "text/html", "UTF-8", "");
-            if (getActivity().getClass().getSimpleName().equals(ArticleActivity.class.getSimpleName())) {
-                getActivity().getActionBar().setTitle(post.getTitle());
+            HabraPost habraPost = new HabraPost();
+            if (habraPost.loadFromDatabase(getActivity(), postId)) {
+                webView.loadDataWithBaseURL("", habraPost.getContent(), "text/html", "UTF-8", "");
+                if (getActivity().getClass().getSimpleName().equals(ArticleActivity.class.getSimpleName())) {
+                    getActivity().getActionBar().setTitle(habraPost.getTitle());
+                }
+            } else {
+                show404();
             }
         } else {
-            webView.loadUrl("file:///android_asset/short_info.html");
-//            webView.loadDataWithBaseURL("", "hahaha, hello", "text/html", "UTF-8", "");
+            showInfo();
         }
+    }
 
+    private void showInfo() {
+        webView.loadUrl("file:///android_asset/short_info.html");
+    }
 
+    private void show404() {
+        webView.loadUrl("file:///android_asset/page_404.html");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loadArticle(activeHabraPost);
-        ListView drawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
+        loadArticle(postId);
+
+        //TODO set active item in listView
+        /*ListView drawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
         if (drawerList != null) {
             drawerList.setItemChecked(activeHabraPost, true);
         }
         ListView listView = (ListView) getActivity().findViewById(R.id.listView);
         if (listView != null) {
             listView.setItemChecked(activeHabraPost, true);
-        }
+        }*/
     }
 
     @Override

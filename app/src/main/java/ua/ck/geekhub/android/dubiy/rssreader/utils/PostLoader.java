@@ -1,8 +1,12 @@
 package ua.ck.geekhub.android.dubiy.rssreader.utils;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -15,10 +19,15 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
+import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
 
 /**
@@ -30,6 +39,7 @@ public class PostLoader extends BaseClass {
     private String url;
     private ProgressBar progressBar;
     private ArrayList<HabraPost> habraPosts = new ArrayList<HabraPost>();
+    private static long lastUpdate = 0;
 
     public PostLoader() {
     }
@@ -59,7 +69,8 @@ public class PostLoader extends BaseClass {
             return false;
         }
 
-        if (PostHolder.needUpdate()) {
+        if (System.currentTimeMillis() - lastUpdate > 10 * 1000) {
+            lastUpdate = System.currentTimeMillis();
             if (view != null) {
                 progressBar = (ProgressBar) view.findViewById(R.id.loading_indicator);
                 progressBar.setVisibility(View.VISIBLE);
@@ -67,6 +78,48 @@ public class PostLoader extends BaseClass {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    SimpleDateFormat parseDateFormat = new SimpleDateFormat("E, dd MMM yyyy kk:mm:ss z", Locale.ENGLISH);
+                    DBHelper dbHelper = DBHelper.getInstance(context);
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+                    String[] projection = {
+                            HabraPost.COLUMN_DATE
+                    };
+
+                    ArrayList<Long>postDates = new ArrayList<Long>();
+                    Cursor cursor = db.query(HabraPost.TABLE_NAME, projection, null, null, null, null, null);
+
+                    if (cursor.moveToFirst()) {
+                        int columnIndexDate = cursor.getColumnIndex(HabraPost.COLUMN_DATE);
+                        do {
+                            postDates.add(cursor.getLong(columnIndexDate));
+                        } while (cursor.moveToNext());
+                    } else {
+//                        Log.d(LOG_TAG, "0 rows");
+                    }
+                    cursor.close();
+
+//                    String res = "";
+//                    for (long postDate : postDates) {
+//                        res = res + postDate + ", ";
+//                    }
+//                    Log.d(LOG_TAG, res);
+
+//                    if (postDates.contains(new Long(1418648288))) {
+//                        Log.d(LOG_TAG, "DADADA");
+//                    } else {
+//                        Log.d(LOG_TAG, "NENENE");
+//                    }
+
+
+
+
+
+
+
+
+
+
                     DefaultHttpClient client = new DefaultHttpClient();
                     HttpGet httpGet = new HttpGet(url);
                     try {
@@ -75,16 +128,47 @@ public class PostLoader extends BaseClass {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray entries = jsonObject.getJSONObject("responseData").getJSONObject("feed").getJSONArray("entries");
                         int entries_count = entries.length();
+
+                        long rowId;
+                        String title;
+                        Long timestamp = new Long(0);
+                        String link;
+                        String content;
+
                         for (int i = 0; i < entries_count; i++) {
-                            HabraPost tmp_post = new HabraPost();
-                            tmp_post.setTitle(entries.getJSONObject(i).getString("title"));
-                            tmp_post.setLink(entries.getJSONObject(i).getString("link"));
-                            tmp_post.setPublishDate(entries.getJSONObject(i).getString("publishedDate"));
-                            tmp_post.setShortContent(entries.getJSONObject(i).getString("contentSnippet"));
-                            tmp_post.setContent(entries.getJSONObject(i).getString("content"));
-                            habraPosts.add(tmp_post);
+                            try {
+                                Date parsedDate = parseDateFormat.parse(entries.getJSONObject(i).getString("publishedDate"));
+                                timestamp = (long)parsedDate.getTime();
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (postDates.contains(timestamp)) {
+                                //Log.d(LOG_TAG, "dont insetr");
+                            } else {
+                                //Log.d(LOG_TAG, "INSERT");
+                                title = entries.getJSONObject(i).getString("title");
+                                link = entries.getJSONObject(i).getString("link");
+                                content = entries.getJSONObject(i).getString("content");
+
+                                ContentValues values = new ContentValues();
+                                values.put(HabraPost.COLUMN_TITLE, title);
+                                values.put(HabraPost.COLUMN_DATE, timestamp);
+                                values.put(HabraPost.COLUMN_LINK, link);
+                                values.put(HabraPost.COLUMN_CONTENT, content);
+//                              values.put(HabraPost.COLUMN_FAVOURITE, 1);
+                                rowId = db.insert(HabraPost.TABLE_NAME, null, values);
+
+
+                                HabraPost tmp_post = new HabraPost();
+                                tmp_post.setId(rowId);
+                                tmp_post.setTitle(title);
+                                tmp_post.setDate(timestamp);
+                                tmp_post.setLink(link);
+                                tmp_post.setContent(content);
+                                habraPosts.add(tmp_post);
+                            }
                         }
-                        PostHolder.setPosts(habraPosts);
 
                         if (view != null) {
                             view.post(new Runnable() {
@@ -96,8 +180,6 @@ public class PostLoader extends BaseClass {
                                     }
                                     HabraAdapter habraAdapter = (HabraAdapter) listView.getAdapter();
                                     if (habraAdapter != null) {
-                                        habraAdapter.clear();
-                                        habraAdapter.notifyDataSetChanged();
                                         habraAdapter.addAll(habraPosts);
                                         habraAdapter.notifyDataSetChanged();
                                     }

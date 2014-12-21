@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
+
 /**
  * Created by Gary on 21.12.2014.
  */
@@ -34,7 +36,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.d(LOG_TAG, "database created");
-        db.execSQL(PostTable.SQL_CREATE);
+        db.execSQL(HabraPost.SQL_CREATE);
     }
 
     @Override

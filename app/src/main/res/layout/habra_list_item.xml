@@ -5,6 +5,11 @@
 
     <TextView
         style="@style/ListItemStyle.Title"
+        android:visibility="gone"
+        android:id="@+id/textViewItemId"
+    />
+    <TextView
+        style="@style/ListItemStyle.Title"
         android:id="@+id/textViewTitle"
         android:textColor="@drawable/item_customized_title_color"
     />

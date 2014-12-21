@@ -5,35 +5,33 @@ import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.renderscript.RenderScript;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import java.sql.Time;
-import java.util.Random;
-
 import ua.ck.geekhub.android.dubiy.rssreader.R;
+import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.TopicsFragment;
-import ua.ck.geekhub.android.dubiy.rssreader.service.RefreshPostsService;
-import ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder;
 
 
 public class StartActivity extends BaseActivity implements TopicsFragment.OnFragmentInteractionListener, ArticleFragment.OnFragmentInteractionListener {
 
     private boolean isMultiPanel;
+    private long postId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
+        //TODO service
 //        Intent intent = new Intent(this, RefreshPostsService.class);
 //        startService(intent);
 
@@ -61,7 +59,6 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
 //            Intent intent = new Intent(this, RefreshPostsService.class);
 //            stopService(intent);
 //        }
-
         super.onBackPressed();
     }
 
@@ -123,17 +120,16 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
             }
             break;
             case R.id.action_share: {
-                int activeHabraPost = -1;
-                ListView listView = (ListView) findViewById(R.id.listView);
-                if (listView != null) {
-                    activeHabraPost = listView.getCheckedItemPosition();
+                HabraPost habraPost = new HabraPost();
+                if (habraPost.loadFromDatabase(this ,postId)) {
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_TEXT, habraPost.getLink());
+                    intent.putExtra(android.content.Intent.EXTRA_SUBJECT, habraPost.getTitle());
+                    startActivity(Intent.createChooser(intent, "Share"));
+                } else {
+                    Toast.makeText(this, "Post not found", Toast.LENGTH_LONG).show();
                 }
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                HabraPost habraPost = PostHolder.getPost(activeHabraPost);
-                intent.putExtra(Intent.EXTRA_TEXT, habraPost.getLink());
-                intent.putExtra(android.content.Intent.EXTRA_SUBJECT, habraPost.getTitle());
-                startActivity(Intent.createChooser(intent, "Share"));
             } break;
             default: {
                 return super.onOptionsItemSelected(item);
@@ -145,16 +141,18 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
     }
 
     @Override
-    public void onFragmentInteraction(int position) {
+    public void onFragmentInteraction(long postId) {
         if (isMultiPanel) {
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            ArticleFragment articleFragment = ArticleFragment.newInstance(position);
+            ArticleFragment articleFragment = ArticleFragment.newInstance(postId);
+            Log.d(LOG_TAG, "fragment postID: " + postId);
             fragmentTransaction.replace(R.id.fragment_article, articleFragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         } else {
             Intent intent = new Intent(this, ArticleActivity.class);
-            intent.putExtra(ArticleActivity.ARG_ACTIVE_HABRA_POST, position);
+            intent.putExtra(ArticleFragment.ARG_POST_ID, postId);
+            Log.d(LOG_TAG, "activity postID: " + postId);
             startActivity(intent);
         }
     }

@@ -1,6 +1,8 @@
 package ua.ck.geekhub.android.dubiy.rssreader.fragment;
 
 import android.app.Activity;
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
@@ -12,10 +14,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.adapter.ArrayAdapterItem;
 import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
+import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
+import ua.ck.geekhub.android.dubiy.rssreader.database.PostTable;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostLoader;
@@ -90,6 +95,27 @@ public class TopicsFragment extends BaseFragment {
     }
 
     public void refresh_posts() {
+        DBHelper dbHelper = DBHelper.getInstance(getActivity());
+        if (dbHelper != null) {
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            Log.d(LOG_TAG, "helper: " + dbHelper.hashCode());
+            Log.d(LOG_TAG, "db: " + db.hashCode());
+        } else {
+            Log.d(LOG_TAG, "helper == null");
+
+        }
+
+//        ContentValues values = new ContentValues();
+//        values.put(PostTable.COLUMN_TITLE, "Hello");
+//        values.put(PostTable.COLUMN_DATE, 1500005);
+//        values.put(PostTable.COLUMN_LINK, "http://garik.pp.ua");
+//        values.put(PostTable.COLUMN_CONTENT, "Hello, Hello, Hello, i dunno");
+//
+//        long rowId = db.insert(PostTable.TABLE_NAME, null, values);
+
+
+
+
         PostLoader postLoader = new PostLoader(getActivity(), view);
         postLoader.refresh_posts();
     }

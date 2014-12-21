@@ -1,8 +1,10 @@
 package ua.ck.geekhub.android.dubiy.rssreader.fragment;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.preference.PreferenceManager;
@@ -18,6 +20,8 @@ import android.widget.Toast;
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.activity.ArticleActivity;
 import ua.ck.geekhub.android.dubiy.rssreader.activity.StartActivity;
+import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
+import ua.ck.geekhub.android.dubiy.rssreader.database.PostTable;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder;
 
@@ -59,6 +63,12 @@ public class ArticleFragment extends BaseFragment {
 
 
     public void loadArticle(int position) {
+
+        DBHelper dbHelper = DBHelper.getInstance(getActivity());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Log.d(LOG_TAG, "db: " + db.hashCode() + ". helper: " + dbHelper.hashCode());
+
+
         activeHabraPost = position;
 
         if (position != -1) {

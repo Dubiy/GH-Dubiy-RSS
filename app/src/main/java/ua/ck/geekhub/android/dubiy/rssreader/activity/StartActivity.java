@@ -34,8 +34,8 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        Intent intent = new Intent(this, RefreshPostsService.class);
-        startService(intent);
+//        Intent intent = new Intent(this, RefreshPostsService.class);
+//        startService(intent);
 
         isMultiPanel = findViewById(R.id.fragment_article) != null;
 
@@ -57,10 +57,10 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
         if ( ! isMultiPanel) {
             fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
-        if (fragmentManager.getBackStackEntryCount() == 0) {
-            Intent intent = new Intent(this, RefreshPostsService.class);
-            stopService(intent);
-        }
+//        if (fragmentManager.getBackStackEntryCount() == 0) {
+//            Intent intent = new Intent(this, RefreshPostsService.class);
+//            stopService(intent);
+//        }
 
         super.onBackPressed();
     }

@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -28,7 +27,7 @@ import java.util.Locale;
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
 import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
-import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
+import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 
 /**
  * Created by Gary on 23.11.2014.
@@ -38,7 +37,7 @@ public class PostLoader extends BaseClass {
     private View view;
     private String url;
     private ProgressBar progressBar;
-    private ArrayList<HabraPost> habraPosts = new ArrayList<HabraPost>();
+    private ArrayList<PostEntity> postEntities = new ArrayList<PostEntity>();
     private static long lastUpdate = 0;
 
     public PostLoader() {
@@ -83,14 +82,14 @@ public class PostLoader extends BaseClass {
                     SQLiteDatabase db = dbHelper.getWritableDatabase();
 
                     String[] projection = {
-                            HabraPost.COLUMN_DATE
+                            PostEntity.COLUMN_DATE
                     };
 
                     ArrayList<Long>postDates = new ArrayList<Long>();
-                    Cursor cursor = db.query(HabraPost.TABLE_NAME, projection, null, null, null, null, null);
+                    Cursor cursor = db.query(PostEntity.TABLE_NAME, projection, null, null, null, null, null);
 
                     if (cursor.moveToFirst()) {
-                        int columnIndexDate = cursor.getColumnIndex(HabraPost.COLUMN_DATE);
+                        int columnIndexDate = cursor.getColumnIndex(PostEntity.COLUMN_DATE);
                         do {
                             postDates.add(cursor.getLong(columnIndexDate));
                         } while (cursor.moveToNext());
@@ -152,21 +151,21 @@ public class PostLoader extends BaseClass {
                                 content = entries.getJSONObject(i).getString("content");
 
                                 ContentValues values = new ContentValues();
-                                values.put(HabraPost.COLUMN_TITLE, title);
-                                values.put(HabraPost.COLUMN_DATE, timestamp);
-                                values.put(HabraPost.COLUMN_LINK, link);
-                                values.put(HabraPost.COLUMN_CONTENT, content);
+                                values.put(PostEntity.COLUMN_TITLE, title);
+                                values.put(PostEntity.COLUMN_DATE, timestamp);
+                                values.put(PostEntity.COLUMN_LINK, link);
+                                values.put(PostEntity.COLUMN_CONTENT, content);
 //                              values.put(HabraPost.COLUMN_FAVOURITE, 1);
-                                rowId = db.insert(HabraPost.TABLE_NAME, null, values);
+                                rowId = db.insert(PostEntity.TABLE_NAME, null, values);
 
 
-                                HabraPost tmp_post = new HabraPost();
+                                PostEntity tmp_post = new PostEntity();
                                 tmp_post.setId(rowId);
                                 tmp_post.setTitle(title);
                                 tmp_post.setDate(timestamp);
                                 tmp_post.setLink(link);
                                 tmp_post.setContent(content);
-                                habraPosts.add(tmp_post);
+                                postEntities.add(tmp_post);
                             }
                         }
 
@@ -180,7 +179,7 @@ public class PostLoader extends BaseClass {
                                     }
                                     HabraAdapter habraAdapter = (HabraAdapter) listView.getAdapter();
                                     if (habraAdapter != null) {
-                                        habraAdapter.addAll(habraPosts);
+                                        habraAdapter.addAll(postEntities);
                                         habraAdapter.notifyDataSetChanged();
                                     }
                                     int checkedItemPosition = listView.getCheckedItemPosition();

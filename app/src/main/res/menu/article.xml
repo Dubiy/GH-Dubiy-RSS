@@ -11,4 +11,9 @@
         android:icon="@drawable/ic_action_share"
         android:orderInCategory="100"
         android:showAsAction="always" />
+    <item android:id="@+id/action_favourite"
+        android:title="@string/action_favourite"
+        android:icon="@drawable/ic_action_favorite_empty"
+        android:orderInCategory="100"
+        android:showAsAction="always" />
 </menu>

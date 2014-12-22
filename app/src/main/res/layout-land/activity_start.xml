@@ -1,0 +1,16 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:id="@+id/frags_layout" >
+
+    <FrameLayout
+        android:layout_width="@dimen/multipane_leftpane_width"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment_topics"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment_article"/>
+</LinearLayout>

@@ -1,18 +1,15 @@
 package ua.ck.geekhub.android.dubiy.rssreader.entity;
 
+import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
-import android.widget.Toast;
-
-import java.util.ArrayList;
 
 import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.BaseClass;
 
-public class HabraPost extends BaseClass implements BaseColumns {
+public class PostEntity extends BaseClass implements BaseColumns {
     private long id;
     private String title;
     private String link;
@@ -26,18 +23,18 @@ public class HabraPost extends BaseClass implements BaseColumns {
     public static final String COLUMN_DATE = "date";
     public static final String COLUMN_CONTENT = "content";
     public static final String COLUMN_FAVOURITE = "favourite";
-    public static final String SQL_CREATE = "CREATE TABLE " + HabraPost.TABLE_NAME + " (" +
-            HabraPost._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-            HabraPost.COLUMN_TITLE + " TEXT," +
-            HabraPost.COLUMN_LINK + " TEXT," +
-            HabraPost.COLUMN_DATE + " INTEGER," +
-            HabraPost.COLUMN_CONTENT + " TEXT," +
-            HabraPost.COLUMN_FAVOURITE + " INTEGER DEFAULT 0" +
+    public static final String SQL_CREATE = "CREATE TABLE " + PostEntity.TABLE_NAME + " (" +
+            PostEntity._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            PostEntity.COLUMN_TITLE + " TEXT," +
+            PostEntity.COLUMN_LINK + " TEXT," +
+            PostEntity.COLUMN_DATE + " INTEGER," +
+            PostEntity.COLUMN_CONTENT + " TEXT," +
+            PostEntity.COLUMN_FAVOURITE + " INTEGER DEFAULT 0" +
             ")";
 
-    public static final String SQL_DELETE = "DROP TABLE IF EXISTS " + HabraPost.TABLE_NAME;
+    public static final String SQL_DELETE = "DROP TABLE IF EXISTS " + PostEntity.TABLE_NAME;
 
-    public HabraPost() {
+    public PostEntity() {
         this.id = 0;
         this.title = "HabraReader";
         this.link = "http://garik.pp.ua";
@@ -46,27 +43,38 @@ public class HabraPost extends BaseClass implements BaseColumns {
         this.favourite = 0;
     }
 
+    public int updatePostFavourite(Context context, long postId, boolean favourite) {
+        DBHelper dbHelper = DBHelper.getInstance(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(PostEntity.COLUMN_FAVOURITE, favourite ? 1 : 0);
+        String selection = "_id = ?";
+        String[] selectionArgs = new String[] { String.valueOf(postId)};
+        return db.update(PostEntity.TABLE_NAME, values, selection, selectionArgs);
+    }
+
     public boolean loadFromDatabase(Context context, long postId) {
         DBHelper dbHelper = DBHelper.getInstance(context);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         String[] projection = {
-                HabraPost._ID,
-                HabraPost.COLUMN_TITLE,
-                HabraPost.COLUMN_LINK,
-                HabraPost.COLUMN_DATE,
-                HabraPost.COLUMN_CONTENT,
-                HabraPost.COLUMN_FAVOURITE
+                PostEntity._ID,
+                PostEntity.COLUMN_TITLE,
+                PostEntity.COLUMN_LINK,
+                PostEntity.COLUMN_DATE,
+                PostEntity.COLUMN_CONTENT,
+                PostEntity.COLUMN_FAVOURITE
         };
         String selection = "_id = ?";
         String[] selectionArgs = new String[] { String.valueOf(postId)};
-        Cursor cursor = db.query(HabraPost.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+        Cursor cursor = db.query(PostEntity.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
         if (cursor.moveToFirst()) {
-            int columnIndexTitle = cursor.getColumnIndex(HabraPost.COLUMN_TITLE);
-            int columnIndexLink = cursor.getColumnIndex(HabraPost.COLUMN_LINK);
-            int columnIndexDate = cursor.getColumnIndex(HabraPost.COLUMN_DATE);
-            int columnIndexContent = cursor.getColumnIndex(HabraPost.COLUMN_CONTENT);
-            int columnIndexFavourite = cursor.getColumnIndex(HabraPost.COLUMN_FAVOURITE);
+            int columnIndexTitle = cursor.getColumnIndex(PostEntity.COLUMN_TITLE);
+            int columnIndexLink = cursor.getColumnIndex(PostEntity.COLUMN_LINK);
+            int columnIndexDate = cursor.getColumnIndex(PostEntity.COLUMN_DATE);
+            int columnIndexContent = cursor.getColumnIndex(PostEntity.COLUMN_CONTENT);
+            int columnIndexFavourite = cursor.getColumnIndex(PostEntity.COLUMN_FAVOURITE);
 
             this.id = postId;
             this.title = cursor.getString(columnIndexTitle);
@@ -126,5 +134,16 @@ public class HabraPost extends BaseClass implements BaseColumns {
 
     public void setDate(long date) {
         this.date = date;
+    }
+
+    public void setFavourite(int favourite) {
+        this.favourite = favourite;
+    }
+
+    public boolean getFavourite() {
+        if (favourite == 1) {
+            return true;
+        }
+        return false;
     }
 }

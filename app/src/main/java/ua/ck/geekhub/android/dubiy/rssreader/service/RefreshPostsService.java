@@ -13,7 +13,7 @@ import java.util.Random;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.activity.StartActivity;
-import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
+import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 
 /**
  * Created by Gary on 08.12.2014.
@@ -22,7 +22,7 @@ public class RefreshPostsService extends Service {
     private final static int mNotificationId = 1;
     private Handler mHandler = new Handler();
     private NotificationManager mNotificationManager;
-    private HabraPost lastHabraPost;
+    private PostEntity lastPostEntity;
     Thread thread;
 
     @Override

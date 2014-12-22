@@ -21,16 +21,19 @@ import java.util.ArrayList;
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
 import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
-import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
+import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostLoader;
 
 public class ArticleActivity extends BaseActivity implements ArticleFragment.OnFragmentInteractionListener {
     private long postId = -1;
+    private boolean postFavourite = false;
+
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private ListView drawerList;
     private String tmpActionBarTitle;
+    private Menu menu;
 
 
     @Override
@@ -57,34 +60,34 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
         DBHelper dbHelper = DBHelper.getInstance(getApplicationContext());
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        ArrayList<HabraPost> habraPosts = new ArrayList<HabraPost>();
-        Cursor cursor = db.query(HabraPost.TABLE_NAME, null, null, null, null, null, null);
+        ArrayList<PostEntity> postEntities = new ArrayList<PostEntity>();
+        Cursor cursor = db.query(PostEntity.TABLE_NAME, null, null, null, null, null, null);
 
         if (cursor.moveToFirst()) {
-            int columnIndexId = cursor.getColumnIndex(HabraPost._ID);
-            int columnIndexTitle = cursor.getColumnIndex(HabraPost.COLUMN_TITLE);
-            int columnIndexLink = cursor.getColumnIndex(HabraPost.COLUMN_LINK);
-            int columnIndexDate = cursor.getColumnIndex(HabraPost.COLUMN_DATE);
-            int columnIndexContent = cursor.getColumnIndex(HabraPost.COLUMN_CONTENT);
+            int columnIndexId = cursor.getColumnIndex(PostEntity._ID);
+            int columnIndexTitle = cursor.getColumnIndex(PostEntity.COLUMN_TITLE);
+            int columnIndexLink = cursor.getColumnIndex(PostEntity.COLUMN_LINK);
+            int columnIndexDate = cursor.getColumnIndex(PostEntity.COLUMN_DATE);
+            int columnIndexContent = cursor.getColumnIndex(PostEntity.COLUMN_CONTENT);
             do {
-                HabraPost habraPost = new HabraPost();
-                habraPost.setId(cursor.getLong(columnIndexId));
-                habraPost.setTitle(cursor.getString(columnIndexTitle));
-                habraPost.setLink(cursor.getString(columnIndexLink));
-                habraPost.setDate(cursor.getLong(columnIndexDate));
-                habraPost.setContent(cursor.getString(columnIndexContent));
-                habraPosts.add(habraPost);
+                PostEntity postEntity = new PostEntity();
+                postEntity.setId(cursor.getLong(columnIndexId));
+                postEntity.setTitle(cursor.getString(columnIndexTitle));
+                postEntity.setLink(cursor.getString(columnIndexLink));
+                postEntity.setDate(cursor.getLong(columnIndexDate));
+                postEntity.setContent(cursor.getString(columnIndexContent));
+                postEntities.add(postEntity);
             } while (cursor.moveToNext());
         } else {
             //empty table
         }
         cursor.close();
 
-        drawerList.setAdapter(new HabraAdapter(this, R.layout.habra_list_item, habraPosts));
+        drawerList.setAdapter(new HabraAdapter(this, R.layout.habra_list_item, postEntities));
         drawerList.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView adapterView, View view, int position, long id) {
-                long postId = new Long(((TextView)view.findViewById(R.id.textViewItemId)).getText().toString());
+                postId = new Long(((TextView)view.findViewById(R.id.textViewItemId)).getText().toString());
                 showArticle(postId, true);
                 drawerLayout.closeDrawer(drawerList);
             }
@@ -104,7 +107,9 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                getActionBar().setTitle(tmpActionBarTitle);
+                if (((String) getActionBar().getTitle()).equals(getResources().getString(R.string.app_name))) {
+                    getActionBar().setTitle(tmpActionBarTitle);
+                }
                 invalidateOptionsMenu();
             }
         };
@@ -126,6 +131,7 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.article, menu);
         return true;
     }
@@ -136,6 +142,12 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
         boolean drawerOpen = drawerLayout.isDrawerOpen(drawerList);
         menu.findItem(R.id.action_refresh).setVisible(drawerOpen);
         menu.findItem(R.id.action_share).setVisible( ! drawerOpen);
+        menu.findItem(R.id.action_favourite).setVisible( ! drawerOpen);
+        if (postFavourite) {
+            menu.findItem(R.id.action_favourite).setIcon(R.drawable.ic_action_favorite);
+        } else {
+            menu.findItem(R.id.action_favourite).setIcon(R.drawable.ic_action_favorite_empty);
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -148,15 +160,22 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
             }
             break;
             case R.id.action_share: {
-                HabraPost habraPost = new HabraPost();
-                if (habraPost.loadFromDatabase(this ,postId)) {
+                PostEntity postEntity = new PostEntity();
+                if (postEntity.loadFromDatabase(this ,postId)) {
                     Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_TEXT, habraPost.getLink());
-                    intent.putExtra(android.content.Intent.EXTRA_SUBJECT, habraPost.getTitle());
+                    intent.putExtra(Intent.EXTRA_TEXT, postEntity.getLink());
+                    intent.putExtra(android.content.Intent.EXTRA_SUBJECT, postEntity.getTitle());
                     startActivity(Intent.createChooser(intent, "Share"));
                 } else {
                     Toast.makeText(this, "Post not found", Toast.LENGTH_LONG).show();
+                }
+            } break;
+            case R.id.action_favourite: {
+                PostEntity postEntity = new PostEntity();
+                if (postEntity.updatePostFavourite(this, postId, !postFavourite) > 0) {
+                    postFavourite = !postFavourite;
+                    invalidateOptionsMenu();
                 }
             } break;
             default: {
@@ -169,6 +188,12 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
     @Override
     public void onFragmentInteraction(long postId) {
         Toast.makeText(getApplicationContext(), "Fragments interaction (ArticleActivity) " + postId, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onFragmentUpdateActionBarFavIcon(boolean favourite) {
+        this.postFavourite = favourite;
+        invalidateOptionsMenu();
     }
 
     @Override

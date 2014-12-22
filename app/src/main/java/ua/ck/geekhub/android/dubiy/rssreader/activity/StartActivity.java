@@ -5,8 +5,6 @@ import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -15,16 +13,16 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
-import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
-import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
+import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.TopicsFragment;
 
-
+//TODO spalsh screen
 public class StartActivity extends BaseActivity implements TopicsFragment.OnFragmentInteractionListener, ArticleFragment.OnFragmentInteractionListener {
 
     private boolean isMultiPanel;
     private long postId = 0;
+    private boolean postFavourite = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +77,12 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
     public boolean onPrepareOptionsMenu(Menu menu) {
         // Called whenever we call invalidateOptionsMenu()
         menu.findItem(R.id.action_share).setVisible(isMultiPanel);
+        menu.findItem(R.id.action_favourite).setVisible(isMultiPanel);
+        if (postFavourite) {
+            menu.findItem(R.id.action_favourite).setIcon(R.drawable.ic_action_favorite);
+        } else {
+            menu.findItem(R.id.action_favourite).setIcon(R.drawable.ic_action_favorite_empty);
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -120,15 +124,22 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
             }
             break;
             case R.id.action_share: {
-                HabraPost habraPost = new HabraPost();
-                if (habraPost.loadFromDatabase(this ,postId)) {
+                PostEntity postEntity = new PostEntity();
+                if (postEntity.loadFromDatabase(this ,postId)) {
                     Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_TEXT, habraPost.getLink());
-                    intent.putExtra(android.content.Intent.EXTRA_SUBJECT, habraPost.getTitle());
+                    intent.putExtra(Intent.EXTRA_TEXT, postEntity.getLink());
+                    intent.putExtra(android.content.Intent.EXTRA_SUBJECT, postEntity.getTitle());
                     startActivity(Intent.createChooser(intent, "Share"));
                 } else {
                     Toast.makeText(this, "Post not found", Toast.LENGTH_LONG).show();
+                }
+            } break;
+            case R.id.action_favourite: {
+                PostEntity postEntity = new PostEntity();
+                if (postEntity.updatePostFavourite(this, postId, !postFavourite) > 0) {
+                    postFavourite = !postFavourite;
+                    invalidateOptionsMenu();
                 }
             } break;
             default: {
@@ -142,18 +153,23 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
 
     @Override
     public void onFragmentInteraction(long postId) {
+        this.postId = postId;
         if (isMultiPanel) {
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             ArticleFragment articleFragment = ArticleFragment.newInstance(postId);
-            Log.d(LOG_TAG, "fragment postID: " + postId);
             fragmentTransaction.replace(R.id.fragment_article, articleFragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         } else {
             Intent intent = new Intent(this, ArticleActivity.class);
             intent.putExtra(ArticleFragment.ARG_POST_ID, postId);
-            Log.d(LOG_TAG, "activity postID: " + postId);
             startActivity(intent);
         }
+    }
+
+    @Override
+    public void onFragmentUpdateActionBarFavIcon(boolean favourite) {
+        this.postFavourite = favourite;
+        invalidateOptionsMenu();
     }
 }

@@ -7,6 +7,11 @@
     <string name="title_activity_frag">FragActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="url">https://ajax.googleapis.com/ajax/services/feed/load?v=2.0&amp;q=http://habrahabr.ru/rss/best/weekly/&amp;num=20</string>
+    <string-array name="action_bar_spinner">
+        <item>All posts</item>
+        <item>Favourite</item>
+    </string-array>
+
     <string-array name="simple_list">
         <item>item 1</item>
         <item>item 2</item>
@@ -33,5 +38,6 @@
     <string name="action_notify">Notify</string>
     <string name="action_start_service">Start service</string>
     <string name="action_stop_service">Stop service</string>
+    <string name="action_favourite">Favourite</string>
 
 </resources>

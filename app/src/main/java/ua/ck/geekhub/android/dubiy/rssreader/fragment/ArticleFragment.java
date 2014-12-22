@@ -2,7 +2,6 @@ package ua.ck.geekhub.android.dubiy.rssreader.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +10,7 @@ import android.webkit.WebView;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.activity.ArticleActivity;
-import ua.ck.geekhub.android.dubiy.rssreader.entity.HabraPost;
+import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 
 public class ArticleFragment extends BaseFragment {
     public static final String ARG_POST_ID = "postId";
@@ -33,6 +32,7 @@ public class ArticleFragment extends BaseFragment {
 
     public interface OnFragmentInteractionListener {
         public void onFragmentInteraction(long postId);
+        public void onFragmentUpdateActionBarFavIcon(boolean favourite);
     }
 
     @Override
@@ -55,11 +55,13 @@ public class ArticleFragment extends BaseFragment {
 
         if (postId != -1) {
 
-            HabraPost habraPost = new HabraPost();
-            if (habraPost.loadFromDatabase(getActivity(), postId)) {
-                webView.loadDataWithBaseURL("", habraPost.getContent(), "text/html", "UTF-8", "");
+            PostEntity postEntity = new PostEntity();
+            if (postEntity.loadFromDatabase(getActivity(), postId)) {
+                webView.loadDataWithBaseURL("", postEntity.getContent(), "text/html", "UTF-8", "");
+                mListener.onFragmentUpdateActionBarFavIcon(postEntity.getFavourite());
+
                 if (getActivity().getClass().getSimpleName().equals(ArticleActivity.class.getSimpleName())) {
-                    getActivity().getActionBar().setTitle(habraPost.getTitle());
+                    getActivity().getActionBar().setTitle(postEntity.getTitle());
                 }
             } else {
                 show404();

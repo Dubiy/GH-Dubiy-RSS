@@ -26,6 +26,7 @@ public class HabraAdapter extends ArrayAdapter {
     private SimpleDateFormat resultDateFormat;
     private SimpleDateFormat parseDateFormat;
     private List<PostEntity> postEntities;
+    private Long selectedPostId = 0L;
 
     public HabraAdapter(Context mContext, int layoutResourceId, List<PostEntity> postEntities) {
         super(mContext, layoutResourceId, postEntities);
@@ -80,6 +81,9 @@ public class HabraAdapter extends ArrayAdapter {
 
         PostEntity postEntity = getHabraPost(position);
         holder.title.setText(postEntity.getTitle());
+        if (postEntity.getId() == selectedPostId) {
+            convertView.setSelected(true);
+        }
         holder.itemId.setText(String.valueOf(postEntity.getId()));
         holder.date.setText(resultDateFormat.format(postEntity.getDate()));
         return convertView;

@@ -30,6 +30,8 @@
     </string-array>
 
     <string name="title_activity_article">ArticleActivity</string>
+    <string name="shared_prefs_file">sharedpreferences</string>
+    <string name="shared_prefs_showFavouritePosts">showFavouritePosts</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_share">Share</string>
     <string name="goto_site">Creator site</string>

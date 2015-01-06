@@ -2,7 +2,14 @@
 
     <style name="Theme.Gary" parent="@android:style/Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/ActionBar.Solid.Gary</item>
+        <item name="android:spinnerItemStyle">@style/ActionBar.Spinner.Gary</item>
     </style>
+
+
+    <style name="ActionBar.Spinner.Gary" parent="@android:style/Widget.Holo.DropDownItem.Spinner">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
 
     <style name="ActionBar.Solid.Gary" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
         <item name="android:background">@drawable/ab_solid_gary</item>

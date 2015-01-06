@@ -2,6 +2,8 @@ package ua.ck.geekhub.android.dubiy.rssreader.fragment;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -30,6 +32,7 @@ public class TopicsFragment extends BaseFragment {
     private OnFragmentInteractionListener mListener;
     private View view;
     private boolean showFavouritePosts = false;
+    private SharedPreferences sPref;
 
     public static TopicsFragment newInstance() {
         TopicsFragment fragment = new TopicsFragment();
@@ -85,16 +88,18 @@ public class TopicsFragment extends BaseFragment {
                 } else {
                     showFavouritePosts = false;
                 }
+
+                sPref = getActivity().getSharedPreferences(getResources().getString(R.string.shared_prefs_file), Context.MODE_PRIVATE);
+                SharedPreferences.Editor ed = sPref.edit();
+                ed.putBoolean(getResources().getString(R.string.shared_prefs_showFavouritePosts), showFavouritePosts);
+                ed.commit();
+
+
+
                 reload_list();
                 return true;
             }
         });
-
-
-
-
-
-
     }
 
     private void reload_list() {
@@ -107,6 +112,10 @@ public class TopicsFragment extends BaseFragment {
             selection = PostEntity.COLUMN_FAVOURITE + " = ?";
             selectionArgs = new String[] { String.valueOf(1)};
         }
+
+        sPref = getActivity().getSharedPreferences(getResources().getString(R.string.shared_prefs_file), Context.MODE_PRIVATE);
+        Long selectedPostId = sPref.getLong(ArticleFragment.ARG_POST_ID, 0);
+        int selectedPostPosition = -1;
 
         ArrayList<PostEntity> postEntities = new ArrayList<PostEntity>();
         Cursor cursor = db.query(PostEntity.TABLE_NAME, null, selection, selectionArgs, null, null, null);
@@ -126,6 +135,9 @@ public class TopicsFragment extends BaseFragment {
                 postEntity.setDate(cursor.getLong(columnIndexDate));
                 postEntity.setContent(cursor.getString(columnIndexContent));
                 postEntities.add(postEntity);
+                if (selectedPostId == postEntity.getId()) {
+                    selectedPostPosition = cursor.getPosition();
+                }
             } while (cursor.moveToNext());
         } else {
             //empty table
@@ -141,6 +153,7 @@ public class TopicsFragment extends BaseFragment {
                 mListener.onFragmentInteraction(postId);
             }
         });
+        listView.setItemChecked(selectedPostPosition, true);
     }
 
     @Override
@@ -160,7 +173,7 @@ public class TopicsFragment extends BaseFragment {
     }
 
     public void refresh_posts() {
-            PostLoader postLoader = new PostLoader(getActivity(), view);
+        PostLoader postLoader = new PostLoader(getActivity(), view);
         postLoader.refresh_posts();
     }
 

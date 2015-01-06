@@ -16,15 +16,13 @@
         android:icon="@drawable/ic_action_refresh"
         android:orderInCategory="100"
         android:showAsAction="never" />
+    <item android:id="@+id/action_stop_service"
+        android:title="@string/action_stop_service"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
     <item android:id="@+id/action_about"
         android:title="@string/action_about"
         android:icon="@drawable/ic_action_about"
         android:orderInCategory="100"
         android:showAsAction="never" />
-    <item android:id="@+id/action_notify"
-        android:title="@string/action_notify"
-        android:orderInCategory="100"
-        android:showAsAction="never" />
-
-
 </menu>

@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
@@ -39,6 +40,7 @@ public class PostLoader extends BaseClass {
     private ProgressBar progressBar;
     private ArrayList<PostEntity> postEntities = new ArrayList<PostEntity>();
     private static long lastUpdate = 0;
+    private int newPostsCount = 0;
 
     public PostLoader() {
     }
@@ -57,7 +59,8 @@ public class PostLoader extends BaseClass {
     }
 
 
-    public boolean refresh_posts() {
+    public int refresh_posts() {
+
 
 
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -65,7 +68,7 @@ public class PostLoader extends BaseClass {
         if (ni == null) {
             // There are no active networks.
             Toast.makeText(context, "No internet access", Toast.LENGTH_LONG).show();
-            return false;
+            return 0;
         }
 
         if (System.currentTimeMillis() - lastUpdate > 10 * 1000) {
@@ -166,6 +169,7 @@ public class PostLoader extends BaseClass {
                                 tmp_post.setLink(link);
                                 tmp_post.setContent(content);
                                 postEntities.add(tmp_post);
+                                newPostsCount++;
                             }
                         }
 
@@ -197,8 +201,8 @@ public class PostLoader extends BaseClass {
             Toast.makeText(context, "Too frequently. Wait some time...", Toast.LENGTH_LONG).show();
         }
 
-        //on finish remove loader icon
-        return true;
+
+        return newPostsCount;
     }
 
 

@@ -1,7 +1,9 @@
 package ua.ck.geekhub.android.dubiy.rssreader.activity;
 
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -33,7 +35,7 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
     private ActionBarDrawerToggle drawerToggle;
     private ListView drawerList;
     private String tmpActionBarTitle;
-    private Menu menu;
+    private SharedPreferences sPref;
 
 
     @Override
@@ -43,7 +45,7 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
 
 
         if (savedInstanceState != null) {
-            postId = savedInstanceState.getInt(ArticleFragment.ARG_POST_ID);
+            postId = savedInstanceState.getLong(ArticleFragment.ARG_POST_ID);
         } else {
             Bundle extras = getIntent().getExtras();
             if (extras != null) {
@@ -56,12 +58,24 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
 
+        sPref = getSharedPreferences(getResources().getString(R.string.shared_prefs_file), MODE_PRIVATE);
+        Long selectedPostId = sPref.getLong(ArticleFragment.ARG_POST_ID, 0);
+        Boolean showFavouritePosts = sPref.getBoolean(getResources().getString(R.string.shared_prefs_showFavouritePosts), false);
+        int selectedPostPosition = -1;
+
+        String selection = null;
+        String[] selectionArgs = null;
+        if (showFavouritePosts) {
+            selection = PostEntity.COLUMN_FAVOURITE + " = ?";
+            selectionArgs = new String[] { String.valueOf(1)};
+        }
+
 
         DBHelper dbHelper = DBHelper.getInstance(getApplicationContext());
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ArrayList<PostEntity> postEntities = new ArrayList<PostEntity>();
-        Cursor cursor = db.query(PostEntity.TABLE_NAME, null, null, null, null, null, null);
+        Cursor cursor = db.query(PostEntity.TABLE_NAME, null, selection, selectionArgs, null, null, null);
 
         if (cursor.moveToFirst()) {
             int columnIndexId = cursor.getColumnIndex(PostEntity._ID);
@@ -77,11 +91,17 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
                 postEntity.setDate(cursor.getLong(columnIndexDate));
                 postEntity.setContent(cursor.getString(columnIndexContent));
                 postEntities.add(postEntity);
+
+                if (selectedPostId == postEntity.getId()) {
+                    selectedPostPosition = cursor.getPosition();
+                }
+
             } while (cursor.moveToNext());
         } else {
             //empty table
         }
         cursor.close();
+
 
         drawerList.setAdapter(new HabraAdapter(this, R.layout.habra_list_item, postEntities));
         drawerList.setOnItemClickListener(new ListView.OnItemClickListener() {
@@ -93,7 +113,7 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
             }
         });
         //TODO set active item
-//        drawerList.setItemChecked(postId, true);
+        drawerList.setItemChecked(selectedPostPosition, true);
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.drawable.ic_drawer, R.string.app_name, R.string.app_name) {
             @Override
@@ -120,6 +140,11 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
 
     private void showArticle(long id, boolean addToBackStack) {
         postId = id;
+        sPref = getSharedPreferences(getResources().getString(R.string.shared_prefs_file), MODE_PRIVATE);
+        SharedPreferences.Editor ed = sPref.edit();
+        ed.putLong(ArticleFragment.ARG_POST_ID, postId);
+        ed.commit();
+
         ArticleFragment articleFragment = ArticleFragment.newInstance(id);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_article, articleFragment);
@@ -131,7 +156,6 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        this.menu = menu;
         getMenuInflater().inflate(R.menu.article, menu);
         return true;
     }

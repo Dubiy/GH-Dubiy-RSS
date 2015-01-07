@@ -41,5 +41,7 @@
     <string name="action_start_service">Start service</string>
     <string name="action_stop_service">Stop service</string>
     <string name="action_favourite">Favourite</string>
+    <string name="title_activity_login">Login</string>
+    <string name="action_login">Login</string>
 
 </resources>

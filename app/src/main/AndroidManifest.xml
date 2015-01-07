@@ -12,6 +12,8 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.Gary" >
     <!--android:theme="@android:style/Theme.Holo.Light">-->
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
         <service android:name=".service.RefreshPostsService" android:exported="false" />
 
         <activity
@@ -27,6 +29,14 @@
         <activity
             android:name=".activity.ArticleActivity"
             android:label="@string/title_activity_article"
+            android:parentActivityName=".activity.StartActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ua.ck.geekhub.android.dubiy.rssreader.activity.StartActivity" />
+        </activity>
+        <activity
+            android:name=".activity.LoginActivity"
+            android:label="@string/title_activity_login"
             android:parentActivityName=".activity.StartActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

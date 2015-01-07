@@ -37,7 +37,7 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        //TODO service
+        //service
         Intent intent = new Intent(this, RefreshPostsService.class);
         intent.putExtra("testValue", "value!!!");
         startService(intent);
@@ -47,23 +47,6 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
                 int status = intent.getIntExtra(Const.PARAM_STATUS, 0);
                 Log.d(LOG_TAG, "onReceive: status = " + status);
                 Toast.makeText(getApplication(), "onReceive: status = " + status, Toast.LENGTH_SHORT).show();
-
-/*
-                // Ловим сообщения об окончании задач
-                if (status == STATUS_FINISH) {
-                    int result = intent.getIntExtra(PARAM_RESULT, 0);
-                    switch (task) {
-                        case TASK1_CODE:
-                            tvTask1.setText("Task1 finish, result = " + result);
-                            break;
-                        case TASK2_CODE:
-                            tvTask2.setText("Task2 finish, result = " + result);
-                            break;
-                        case TASK3_CODE:
-                            tvTask3.setText("Task3 finish, result = " + result);
-                            break;
-                    }
-                }*/
             }
         };
         IntentFilter intentFilter = new IntentFilter(Const.BROADCAST_ACTION);
@@ -128,6 +111,10 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
         switch (item.getItemId()) {
             case R.id.action_about: {
                 aboutAuthor();
+            }
+            break;
+            case R.id.action_login: {
+                startActivity(new Intent(this, LoginActivity.class));
             }
             break;
             case R.id.action_stop_service: {

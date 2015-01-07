@@ -16,6 +16,10 @@
         android:icon="@drawable/ic_action_refresh"
         android:orderInCategory="100"
         android:showAsAction="never" />
+    <item android:id="@+id/action_login"
+        android:title="@string/action_login"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
     <item android:id="@+id/action_stop_service"
         android:title="@string/action_stop_service"
         android:orderInCategory="100"

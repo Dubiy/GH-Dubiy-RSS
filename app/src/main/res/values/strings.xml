@@ -43,5 +43,7 @@
     <string name="action_favourite">Favourite</string>
     <string name="title_activity_login">Login</string>
     <string name="action_login">Login</string>
-
+    <string name="facebook_app_id">538226516280608</string>
+    <string name="title_facebook_login">Facebooke login</string>
+    <!--facebook secret b336e966ff126a2d5323e61ba0558ecb-->
 </resources>

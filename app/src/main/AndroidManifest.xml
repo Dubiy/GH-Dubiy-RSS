@@ -12,8 +12,8 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.Gary" >
     <!--android:theme="@android:style/Theme.Holo.Light">-->
-        <meta-data android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
         <service android:name=".service.RefreshPostsService" android:exported="false" />
 
         <activity
@@ -25,6 +25,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.facebook.LoginActivity"
+            android:label="@string/title_facebook_login" >
         </activity>
         <activity
             android:name=".activity.ArticleActivity"

@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.facebook.AppEventsLogger;
+
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
@@ -24,6 +26,7 @@ import ua.ck.geekhub.android.dubiy.rssreader.service.RefreshPostsService;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.Const;
 
 //TODO spalsh screen
+//TODO localization
 public class StartActivity extends BaseActivity implements TopicsFragment.OnFragmentInteractionListener, ArticleFragment.OnFragmentInteractionListener {
 
     private boolean isMultiPanel;
@@ -70,7 +73,7 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
     public void onBackPressed() {
         Log.d(LOG_TAG, "onBackPressed. isMultiPanel: " + isMultiPanel);
         FragmentManager fragmentManager = getFragmentManager();
-        if ( ! isMultiPanel) {
+        if (!isMultiPanel) {
             fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
 //        if (fragmentManager.getBackStackEntryCount() == 0) {
@@ -85,6 +88,13 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
         super.onResume();
         isMultiPanel = findViewById(R.id.fragment_article) != null;
         invalidateOptionsMenu();
+        AppEventsLogger.activateApp(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        AppEventsLogger.deactivateApp(this);
     }
 
     @Override
@@ -141,16 +151,17 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
                 mNotificationManager.notify(mNotificationId, mBuilder.build());
 */
 
-            } break;
+            }
+            break;
             case R.id.action_refresh: {
                 FragmentManager fragmentManager = getFragmentManager();
-                TopicsFragment topicsFragment = (TopicsFragment)fragmentManager.findFragmentById(R.id.fragment_topics);
+                TopicsFragment topicsFragment = (TopicsFragment) fragmentManager.findFragmentById(R.id.fragment_topics);
                 topicsFragment.refresh_posts();
             }
             break;
             case R.id.action_share: {
                 PostEntity postEntity = new PostEntity();
-                if (postEntity.loadFromDatabase(this ,postId)) {
+                if (postEntity.loadFromDatabase(this, postId)) {
                     Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setType("text/plain");
                     intent.putExtra(Intent.EXTRA_TEXT, postEntity.getLink());
@@ -159,14 +170,16 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
                 } else {
                     Toast.makeText(this, "Post not found", Toast.LENGTH_LONG).show();
                 }
-            } break;
+            }
+            break;
             case R.id.action_favourite: {
                 PostEntity postEntity = new PostEntity();
                 if (postEntity.updatePostFavourite(this, postId, !postFavourite) > 0) {
                     postFavourite = !postFavourite;
                     invalidateOptionsMenu();
                 }
-            } break;
+            }
+            break;
             default: {
                 return super.onOptionsItemSelected(item);
             }
@@ -175,6 +188,7 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
 
 
     }
+
 
     @Override
     public void onFragmentInteraction(long postId) {
@@ -205,7 +219,7 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(broadcastReceiver);
     }

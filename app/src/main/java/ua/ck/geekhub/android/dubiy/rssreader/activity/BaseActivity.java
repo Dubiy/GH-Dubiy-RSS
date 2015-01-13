@@ -5,7 +5,12 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
+
+import com.facebook.UiLifecycleHelper;
+import com.facebook.widget.FacebookDialog;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 
@@ -37,6 +42,7 @@ public class BaseActivity extends Activity {
                 .setIcon(R.drawable.ic_launcher)
                 .show();
     }
+
 
 
 

@@ -20,6 +20,10 @@
         android:title="@string/action_login"
         android:orderInCategory="100"
         android:showAsAction="never" />
+    <item android:id="@+id/action_loogle"
+        android:title="@string/action_loogle"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
     <item android:id="@+id/action_stop_service"
         android:title="@string/action_stop_service"
         android:orderInCategory="100"

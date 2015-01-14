@@ -126,6 +126,7 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
             case R.id.action_login: {
                 startActivity(new Intent(this, LoginActivity.class));
             }
+
             break;
             case R.id.action_stop_service: {
                 Intent intent = new Intent(this, RefreshPostsService.class);

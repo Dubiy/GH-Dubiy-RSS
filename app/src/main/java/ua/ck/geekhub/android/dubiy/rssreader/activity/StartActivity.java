@@ -2,22 +2,17 @@ package ua.ck.geekhub.android.dubiy.rssreader.activity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import com.facebook.AppEventsLogger;
-
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
@@ -25,25 +20,52 @@ import ua.ck.geekhub.android.dubiy.rssreader.fragment.TopicsFragment;
 import ua.ck.geekhub.android.dubiy.rssreader.service.RefreshPostsService;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.Const;
 
-//TODO spalsh screen
-//TODO localization
 public class StartActivity extends BaseActivity implements TopicsFragment.OnFragmentInteractionListener, ArticleFragment.OnFragmentInteractionListener {
 
     private boolean isMultiPanel;
-    private long postId = 0;
+    private long postId = -1;
     private boolean postFavourite = false;
     private SharedPreferences sPref;
     private BroadcastReceiver broadcastReceiver;
+    private boolean serviceRunning = true;
+    private final String SERVICE_RUNNING_KEY = "serviceRunning";
+    private final String POST_ID_KEY = "postId";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+        isMultiPanel = findViewById(R.id.fragment_article) != null;
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
 
-        //service
-        Intent intent = new Intent(this, RefreshPostsService.class);
-        intent.putExtra("testValue", "value!!!");
-        startService(intent);
+        if (savedInstanceState == null) {
+            TopicsFragment topicsFragment = TopicsFragment.newInstance();
+            fragmentTransaction.replace(R.id.fragment_topics, topicsFragment);
+        }
+        if (savedInstanceState != null) {
+            serviceRunning = savedInstanceState.getBoolean(SERVICE_RUNNING_KEY, serviceRunning);
+            postId = savedInstanceState.getLong(POST_ID_KEY, postId);
+        }
+
+
+        if (isMultiPanel) {
+            ArticleFragment articleFragment = null;
+            if (postId > 0) {
+                articleFragment = ArticleFragment.newInstance(postId);
+            } else {
+                articleFragment = new ArticleFragment();
+            }
+            fragmentTransaction.replace(R.id.fragment_article, articleFragment);
+        }
+        fragmentTransaction.commit();
+
+        if (savedInstanceState != null) {
+            serviceRunning = savedInstanceState.getBoolean(SERVICE_RUNNING_KEY, serviceRunning);
+            postId = savedInstanceState.getLong(POST_ID_KEY, postId);
+        }
+        if (serviceRunning) {
+            startService(new Intent(this, RefreshPostsService.class));
+        }
 
         broadcastReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
@@ -54,32 +76,14 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
         };
         IntentFilter intentFilter = new IntentFilter(Const.BROADCAST_ACTION);
         registerReceiver(broadcastReceiver, intentFilter);
-
-
-        isMultiPanel = findViewById(R.id.fragment_article) != null;
-
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        TopicsFragment topicsFragment = TopicsFragment.newInstance();
-        fragmentTransaction.replace(R.id.fragment_topics, topicsFragment);
-
-        if (isMultiPanel) {
-            ArticleFragment articleFragment = new ArticleFragment();
-            fragmentTransaction.replace(R.id.fragment_article, articleFragment);
-        }
-        fragmentTransaction.commit();
     }
 
     @Override
     public void onBackPressed() {
-        Log.d(LOG_TAG, "onBackPressed. isMultiPanel: " + isMultiPanel);
         FragmentManager fragmentManager = getFragmentManager();
         if (!isMultiPanel) {
             fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
-//        if (fragmentManager.getBackStackEntryCount() == 0) {
-//            Intent intent = new Intent(this, RefreshPostsService.class);
-//            stopService(intent);
-//        }
         super.onBackPressed();
     }
 
@@ -121,45 +125,20 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
         switch (item.getItemId()) {
             case R.id.action_about: {
                 aboutAuthor();
-            }
-            break;
+            } break;
             case R.id.action_login: {
                 startActivity(new Intent(this, LoginActivity.class));
-            }
-
-            break;
+            } break;
             case R.id.action_stop_service: {
                 Intent intent = new Intent(this, RefreshPostsService.class);
                 stopService(intent);
-
-/*
-                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).
-                        setSmallIcon(R.drawable.ic_launcher).
-                        setContentTitle("Hello, megaMAN!").
-                        setContentText("wou! Wou, baby!").
-                        setAutoCancel(true).
-                        setProgress(100, 35, false).
-                        setPriority(NotificationCompat.PRIORITY_DEFAULT).
-                        setLights(android.R.color.holo_green_light, 500, 500);
-//                        setVibrate(vibrate);
-
-                Intent resultIntent = new Intent(this, ArticleActivity.class);
-                PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0,resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                mBuilder.setContentIntent(resultPendingIntent);
-
-                int mNotificationId = 1;
-                NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                mNotificationManager.notify(mNotificationId, mBuilder.build());
-*/
-
-            }
-            break;
+                serviceRunning = false;
+            } break;
             case R.id.action_refresh: {
                 FragmentManager fragmentManager = getFragmentManager();
                 TopicsFragment topicsFragment = (TopicsFragment) fragmentManager.findFragmentById(R.id.fragment_topics);
                 topicsFragment.refresh_posts();
-            }
-            break;
+            } break;
             case R.id.action_share: {
                 PostEntity postEntity = new PostEntity();
                 if (postEntity.loadFromDatabase(this, postId)) {
@@ -171,34 +150,25 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
                 } else {
                     Toast.makeText(this, "Post not found", Toast.LENGTH_LONG).show();
                 }
-            }
-            break;
+            } break;
             case R.id.action_favourite: {
                 PostEntity postEntity = new PostEntity();
                 if (postEntity.updatePostFavourite(this, postId, !postFavourite) > 0) {
                     postFavourite = !postFavourite;
                     invalidateOptionsMenu();
                 }
-            }
-            break;
+            } break;
             default: {
                 return super.onOptionsItemSelected(item);
             }
         }
         return true;
-
-
     }
 
 
     @Override
     public void onFragmentInteraction(long postId) {
         this.postId = postId;
-
-        sPref = getSharedPreferences(getResources().getString(R.string.shared_prefs_file), MODE_PRIVATE);
-        SharedPreferences.Editor ed = sPref.edit();
-        ed.putLong(ArticleFragment.ARG_POST_ID, postId);
-        ed.commit();
 
         if (isMultiPanel) {
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
@@ -223,5 +193,12 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(broadcastReceiver);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(SERVICE_RUNNING_KEY, serviceRunning);
+        outState.putLong(POST_ID_KEY, postId);
+        super.onSaveInstanceState(outState);
     }
 }

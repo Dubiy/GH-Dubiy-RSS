@@ -4,6 +4,6 @@
     <item android:drawable="@color/color_item_bg_active" android:state_activated="true" />
     <item android:drawable="@color/color_item_bg_pressed" android:state_pressed="true" />
     <item android:drawable="@color/color_item_bg_selected" android:state_selected="true" />
-    <!--<item android:drawable="@color/color_item_bg"></item> &lt;!&ndash; default bg &ndash;&gt;-->
+    <item android:drawable="@color/color_item_bg"></item>
 
 </selector>

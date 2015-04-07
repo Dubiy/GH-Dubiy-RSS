@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -24,8 +25,6 @@ import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
 import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostLoader;
-
-//import static ua.ck.geekhub.android.dubiy.rssreader.utils.PostHolder.getPosts;
 
 public class TopicsFragment extends BaseFragment {
     private ListView listView;
@@ -36,10 +35,6 @@ public class TopicsFragment extends BaseFragment {
 
     public static TopicsFragment newInstance() {
         TopicsFragment fragment = new TopicsFragment();
-        //Bundle args = new Bundle();
-        //args.putString(ARG_PARAM1, param1);
-        //args.putString(ARG_PARAM2, param2);
-        //fragment.setArguments(args);
         return fragment;
     }
 
@@ -58,6 +53,11 @@ public class TopicsFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_topics, container, false);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -153,7 +153,11 @@ public class TopicsFragment extends BaseFragment {
                 mListener.onFragmentInteraction(postId);
             }
         });
-        listView.setItemChecked(selectedPostPosition, true);
+
+        if (getActivity().findViewById(R.id.fragment_article) != null) {
+            listView.setItemChecked(selectedPostPosition, true);
+        }
+
     }
 
     @Override

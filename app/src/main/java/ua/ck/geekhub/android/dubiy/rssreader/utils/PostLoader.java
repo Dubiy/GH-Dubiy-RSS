@@ -39,7 +39,6 @@ public class PostLoader extends BaseClass {
     private String url;
     private ProgressBar progressBar;
     private ArrayList<PostEntity> postEntities = new ArrayList<PostEntity>();
-    private static long lastUpdate = 0;
     private int newPostsCount = 0;
 
     public PostLoader() {
@@ -48,13 +47,13 @@ public class PostLoader extends BaseClass {
     public PostLoader(Context context) {
         this.context = context;
         this.view = null;
-        url = context.getResources().getString(R.string.url);
+        url = Const.FEED_URL;
     }
 
     public PostLoader(Context context, View view) {
         this.context = context;
         this.view = view;
-        url = context.getResources().getString(R.string.url);
+        url = Const.FEED_URL;
 
     }
 
@@ -71,135 +70,111 @@ public class PostLoader extends BaseClass {
             return 0;
         }
 
-        if (System.currentTimeMillis() - lastUpdate > 10 * 1000) {
-            lastUpdate = System.currentTimeMillis();
-            if (view != null) {
-                progressBar = (ProgressBar) view.findViewById(R.id.loading_indicator);
-                progressBar.setVisibility(View.VISIBLE);
-            }
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    SimpleDateFormat parseDateFormat = new SimpleDateFormat("E, dd MMM yyyy kk:mm:ss z", Locale.ENGLISH);
-                    DBHelper dbHelper = DBHelper.getInstance(context);
-                    SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-                    String[] projection = {
-                            PostEntity.COLUMN_DATE
-                    };
-
-                    ArrayList<Long>postDates = new ArrayList<Long>();
-                    Cursor cursor = db.query(PostEntity.TABLE_NAME, projection, null, null, null, null, null);
-
-                    if (cursor.moveToFirst()) {
-                        int columnIndexDate = cursor.getColumnIndex(PostEntity.COLUMN_DATE);
-                        do {
-                            postDates.add(cursor.getLong(columnIndexDate));
-                        } while (cursor.moveToNext());
-                    } else {
-//                        Log.d(LOG_TAG, "0 rows");
-                    }
-                    cursor.close();
-
-//                    String res = "";
-//                    for (long postDate : postDates) {
-//                        res = res + postDate + ", ";
-//                    }
-//                    Log.d(LOG_TAG, res);
-
-//                    if (postDates.contains(new Long(1418648288))) {
-//                        Log.d(LOG_TAG, "DADADA");
-//                    } else {
-//                        Log.d(LOG_TAG, "NENENE");
-//                    }
-
-
-
-
-
-
-
-
-
-
-                    DefaultHttpClient client = new DefaultHttpClient();
-                    HttpGet httpGet = new HttpGet(url);
-                    try {
-                        HttpResponse httpResponse = client.execute(httpGet);
-                        final String response = EntityUtils.toString(httpResponse.getEntity());
-                        JSONObject jsonObject = new JSONObject(response);
-                        JSONArray entries = jsonObject.getJSONObject("responseData").getJSONObject("feed").getJSONArray("entries");
-                        int entries_count = entries.length();
-
-                        long rowId;
-                        String title;
-                        Long timestamp = new Long(0);
-                        String link;
-                        String content;
-
-                        for (int i = 0; i < entries_count; i++) {
-                            try {
-                                Date parsedDate = parseDateFormat.parse(entries.getJSONObject(i).getString("publishedDate"));
-                                timestamp = (long)parsedDate.getTime();
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-
-                            if (postDates.contains(timestamp)) {
-                                //Log.d(LOG_TAG, "dont insetr");
-                            } else {
-                                //Log.d(LOG_TAG, "INSERT");
-                                title = entries.getJSONObject(i).getString("title");
-                                link = entries.getJSONObject(i).getString("link");
-                                content = entries.getJSONObject(i).getString("content");
-
-                                ContentValues values = new ContentValues();
-                                values.put(PostEntity.COLUMN_TITLE, title);
-                                values.put(PostEntity.COLUMN_DATE, timestamp);
-                                values.put(PostEntity.COLUMN_LINK, link);
-                                values.put(PostEntity.COLUMN_CONTENT, content);
-//                              values.put(HabraPost.COLUMN_FAVOURITE, 1);
-                                rowId = db.insert(PostEntity.TABLE_NAME, null, values);
-
-
-                                PostEntity tmp_post = new PostEntity();
-                                tmp_post.setId(rowId);
-                                tmp_post.setTitle(title);
-                                tmp_post.setDate(timestamp);
-                                tmp_post.setLink(link);
-                                tmp_post.setContent(content);
-                                postEntities.add(tmp_post);
-                                newPostsCount++;
-                            }
-                        }
-
-                        if (view != null) {
-                            view.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ListView listView = (ListView) view.findViewById(R.id.listView);
-                                    if (listView == null) {
-                                        listView = (ListView) view.findViewById(R.id.left_drawer);
-                                    }
-                                    HabraAdapter habraAdapter = (HabraAdapter) listView.getAdapter();
-                                    if (habraAdapter != null) {
-                                        habraAdapter.addAll(postEntities);
-                                        habraAdapter.notifyDataSetChanged();
-                                    }
-                                    int checkedItemPosition = listView.getCheckedItemPosition();
-                                    listView.setItemChecked(checkedItemPosition, true);
-                                    progressBar.setVisibility(View.GONE);
-                                }
-                            });
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        } else {
-            Toast.makeText(context, "Too frequently. Wait some time...", Toast.LENGTH_LONG).show();
+        if (view != null) {
+            progressBar = (ProgressBar) view.findViewById(R.id.loading_indicator);
+            progressBar.setVisibility(View.VISIBLE);
         }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SimpleDateFormat parseDateFormat = new SimpleDateFormat("E, dd MMM yyyy kk:mm:ss z", Locale.ENGLISH);
+                DBHelper dbHelper = DBHelper.getInstance(context);
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+                String[] projection = {
+                        PostEntity.COLUMN_DATE
+                };
+
+                ArrayList<Long>postDates = new ArrayList<Long>();
+                Cursor cursor = db.query(PostEntity.TABLE_NAME, projection, null, null, null, null, null);
+
+                if (cursor.moveToFirst()) {
+                    int columnIndexDate = cursor.getColumnIndex(PostEntity.COLUMN_DATE);
+                    do {
+                        postDates.add(cursor.getLong(columnIndexDate));
+                    } while (cursor.moveToNext());
+                } else {
+//                        Log.d(LOG_TAG, "0 rows");
+                }
+                cursor.close();
+
+                DefaultHttpClient client = new DefaultHttpClient();
+                HttpGet httpGet = new HttpGet(url);
+                try {
+                    HttpResponse httpResponse = client.execute(httpGet);
+                    final String response = EntityUtils.toString(httpResponse.getEntity());
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray entries = jsonObject.getJSONObject("responseData").getJSONObject("feed").getJSONArray("entries");
+                    int entries_count = entries.length();
+
+                    long rowId;
+                    String title;
+                    Long timestamp = new Long(0);
+                    String link;
+                    String content;
+
+                    for (int i = 0; i < entries_count; i++) {
+                        try {
+                            Date parsedDate = parseDateFormat.parse(entries.getJSONObject(i).getString("publishedDate"));
+                            timestamp = (long)parsedDate.getTime();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (postDates.contains(timestamp)) {
+                            //Log.d(LOG_TAG, "dont insetr");
+                        } else {
+                            //Log.d(LOG_TAG, "INSERT");
+                            title = entries.getJSONObject(i).getString("title");
+                            link = entries.getJSONObject(i).getString("link");
+                            content = entries.getJSONObject(i).getString("content");
+
+                            ContentValues values = new ContentValues();
+                            values.put(PostEntity.COLUMN_TITLE, title);
+                            values.put(PostEntity.COLUMN_DATE, timestamp);
+                            values.put(PostEntity.COLUMN_LINK, link);
+                            values.put(PostEntity.COLUMN_CONTENT, content);
+//                              values.put(HabraPost.COLUMN_FAVOURITE, 1);
+                            rowId = db.insert(PostEntity.TABLE_NAME, null, values);
+
+
+                            PostEntity tmp_post = new PostEntity();
+                            tmp_post.setId(rowId);
+                            tmp_post.setTitle(title);
+                            tmp_post.setDate(timestamp);
+                            tmp_post.setLink(link);
+                            tmp_post.setContent(content);
+                            postEntities.add(tmp_post);
+                            newPostsCount++;
+                        }
+                    }
+
+                    if (view != null) {
+                        view.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                ListView listView = (ListView) view.findViewById(R.id.listView);
+                                if (listView == null) {
+                                    listView = (ListView) view.findViewById(R.id.left_drawer);
+                                }
+                                HabraAdapter habraAdapter = (HabraAdapter) listView.getAdapter();
+                                if (habraAdapter != null) {
+                                    habraAdapter.addAll(postEntities);
+                                    habraAdapter.notifyDataSetChanged();
+                                }
+                                int checkedItemPosition = listView.getCheckedItemPosition();
+                                listView.setItemChecked(checkedItemPosition, true);
+                                progressBar.setVisibility(View.GONE);
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
 
 
         return newPostsCount;

@@ -36,6 +36,7 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
     private ListView drawerList;
     private String tmpActionBarTitle;
     private SharedPreferences sPref;
+    private final String POST_ID_KEY = "postId";
 
 
     @Override
@@ -45,7 +46,7 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
 
 
         if (savedInstanceState != null) {
-            postId = savedInstanceState.getLong(ArticleFragment.ARG_POST_ID);
+            postId = savedInstanceState.getLong(POST_ID_KEY, postId);
         } else {
             Bundle extras = getIntent().getExtras();
             if (extras != null) {
@@ -59,7 +60,6 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
         drawerList = (ListView) findViewById(R.id.left_drawer);
 
         sPref = getSharedPreferences(getResources().getString(R.string.shared_prefs_file), MODE_PRIVATE);
-        Long selectedPostId = sPref.getLong(ArticleFragment.ARG_POST_ID, 0);
         Boolean showFavouritePosts = sPref.getBoolean(getResources().getString(R.string.shared_prefs_showFavouritePosts), false);
         int selectedPostPosition = -1;
 
@@ -92,7 +92,7 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
                 postEntity.setContent(cursor.getString(columnIndexContent));
                 postEntities.add(postEntity);
 
-                if (selectedPostId == postEntity.getId()) {
+                if (postId == postEntity.getId()) {
                     selectedPostPosition = cursor.getPosition();
                 }
 
@@ -140,10 +140,6 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
 
     private void showArticle(long id, boolean addToBackStack) {
         postId = id;
-        sPref = getSharedPreferences(getResources().getString(R.string.shared_prefs_file), MODE_PRIVATE);
-        SharedPreferences.Editor ed = sPref.edit();
-        ed.putLong(ArticleFragment.ARG_POST_ID, postId);
-        ed.commit();
 
         ArticleFragment articleFragment = ArticleFragment.newInstance(id);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
@@ -185,7 +181,7 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
             break;
             case R.id.action_share: {
                 PostEntity postEntity = new PostEntity();
-                if (postEntity.loadFromDatabase(this ,postId)) {
+                if (postEntity.loadFromDatabase(this, postId)) {
                     Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setType("text/plain");
                     intent.putExtra(Intent.EXTRA_TEXT, postEntity.getLink());
@@ -223,6 +219,6 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(ArticleFragment.ARG_POST_ID, postId);
+        outState.putLong(POST_ID_KEY, postId);
     }
 }

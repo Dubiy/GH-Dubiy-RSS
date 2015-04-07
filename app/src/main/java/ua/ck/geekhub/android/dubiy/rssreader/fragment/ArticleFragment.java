@@ -83,16 +83,6 @@ public class ArticleFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         loadArticle(postId);
-
-        //TODO set active item in listView
-        /*ListView drawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
-        if (drawerList != null) {
-            drawerList.setItemChecked(activeHabraPost, true);
-        }
-        ListView listView = (ListView) getActivity().findViewById(R.id.listView);
-        if (listView != null) {
-            listView.setItemChecked(activeHabraPost, true);
-        }*/
     }
 
     @Override

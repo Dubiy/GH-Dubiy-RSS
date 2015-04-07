@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
+    <color name="color_item_bg">#0099cc</color>
     <color name="color_item_bg_active">#4dbce9</color>
     <color name="color_item_bg_pressed">#26ade4</color>
     <color name="color_item_bg_selected">#26ade4</color>
     <color name="color_left_sidebar">#0099cc</color>
-    <!--<color name="color_left_sidebar">#2c5b7f</color>-->
 
     <color name="color_item_title_active">#000000</color>
     <color name="color_item_title_pressed">#ffffff</color>

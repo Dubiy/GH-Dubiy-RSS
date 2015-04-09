@@ -11,9 +11,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 import com.facebook.AppEventsLogger;
 import ua.ck.geekhub.android.dubiy.rssreader.R;
+import ua.ck.geekhub.android.dubiy.rssreader.asynctask.PostLoad;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.TopicsFragment;
@@ -63,8 +66,12 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
             serviceRunning = savedInstanceState.getBoolean(SERVICE_RUNNING_KEY, serviceRunning);
             postId = savedInstanceState.getLong(POST_ID_KEY, postId);
         }
+
         if (serviceRunning) {
-            startService(new Intent(this, RefreshPostsService.class));
+//                    startService(new Intent(getApplicationContext(), RefreshPostsService.class));
+            
+            serviceRunning = false;
+
         }
 
         broadcastReceiver = new BroadcastReceiver() {
@@ -135,9 +142,11 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
                 serviceRunning = false;
             } break;
             case R.id.action_refresh: {
-                FragmentManager fragmentManager = getFragmentManager();
-                TopicsFragment topicsFragment = (TopicsFragment) fragmentManager.findFragmentById(R.id.fragment_topics);
-                topicsFragment.refresh_posts();
+                new PostLoad(getApplicationContext(), this).execute(false);
+
+//                FragmentManager fragmentManager = getFragmentManager();
+//                TopicsFragment topicsFragment = (TopicsFragment) fragmentManager.findFragmentById(R.id.fragment_topics);
+//                topicsFragment.refresh_posts();
             } break;
             case R.id.action_share: {
                 PostEntity postEntity = new PostEntity();

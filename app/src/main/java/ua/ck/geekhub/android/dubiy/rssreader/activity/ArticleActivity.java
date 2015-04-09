@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
+import ua.ck.geekhub.android.dubiy.rssreader.asynctask.PostLoad;
 import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
@@ -75,7 +76,7 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ArrayList<PostEntity> postEntities = new ArrayList<PostEntity>();
-        Cursor cursor = db.query(PostEntity.TABLE_NAME, null, selection, selectionArgs, null, null, null);
+        Cursor cursor = db.query(PostEntity.TABLE_NAME, null, selection, selectionArgs, null, null, PostEntity.COLUMN_DATE + " DESC");
 
         if (cursor.moveToFirst()) {
             int columnIndexId = cursor.getColumnIndex(PostEntity._ID);
@@ -175,8 +176,9 @@ public class ArticleActivity extends BaseActivity implements ArticleFragment.OnF
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh: {
-                PostLoader postLoader = new PostLoader(this, drawerLayout);
-                postLoader.refresh_posts();
+                new PostLoad(getApplicationContext(), this).execute(false, this);
+//                PostLoader postLoader = new PostLoader(this, drawerLayout);
+//                postLoader.refresh_posts();
             }
             break;
             case R.id.action_share: {

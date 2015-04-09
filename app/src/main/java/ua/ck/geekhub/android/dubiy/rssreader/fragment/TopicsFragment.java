@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
+import ua.ck.geekhub.android.dubiy.rssreader.asynctask.PostLoad;
 import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostLoader;
@@ -67,7 +68,8 @@ public class TopicsFragment extends BaseFragment {
         listView = (ListView) view.findViewById(R.id.listView);
 
         if (savedInstanceState == null) {
-            refresh_posts();
+//            refresh_posts();
+            new PostLoad(getActivity().getApplicationContext(), getActivity()).execute(true);
         }
 
         final ActionBar actionBar = getActivity().getActionBar();
@@ -102,7 +104,7 @@ public class TopicsFragment extends BaseFragment {
         });
     }
 
-    private void reload_list() {
+    public void reload_list() {
         DBHelper dbHelper = DBHelper.getInstance(getActivity());
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -118,8 +120,7 @@ public class TopicsFragment extends BaseFragment {
         int selectedPostPosition = -1;
 
         ArrayList<PostEntity> postEntities = new ArrayList<PostEntity>();
-        Cursor cursor = db.query(PostEntity.TABLE_NAME, null, selection, selectionArgs, null, null, null);
-
+        Cursor cursor = db.query(PostEntity.TABLE_NAME, null, selection, selectionArgs, null, null, PostEntity.COLUMN_DATE + " DESC");
 
         if (cursor.moveToFirst()) {
             int columnIndexId = cursor.getColumnIndex(PostEntity._ID);
@@ -176,10 +177,11 @@ public class TopicsFragment extends BaseFragment {
         mListener = null;
     }
 
-    public void refresh_posts() {
-        PostLoader postLoader = new PostLoader(getActivity(), view);
-        postLoader.refresh_posts();
-    }
+//    public void refresh_posts() {
+//        PostLoader postLoader = new PostLoader(getActivity(), view);
+//        postLoader.refresh_posts();
+
+//    }
 
 
 }

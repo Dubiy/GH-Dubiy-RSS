@@ -169,6 +169,12 @@ public class PostLoader extends BaseClass {
                             }
                         });
                     }
+
+                    //do with newPostCount
+
+
+
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

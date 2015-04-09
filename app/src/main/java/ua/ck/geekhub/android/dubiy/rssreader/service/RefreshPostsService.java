@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import ua.ck.geekhub.android.dubiy.rssreader.R;
 import ua.ck.geekhub.android.dubiy.rssreader.activity.StartActivity;
+import ua.ck.geekhub.android.dubiy.rssreader.asynctask.PostLoad;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.Const;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.PostLoader;
@@ -111,20 +112,22 @@ public class RefreshPostsService extends Service {
 
                     //do some stuff
 
-                    PostLoader postLoader = new PostLoader(getApplicationContext());
-                    newPostsCount = postLoader.refresh_posts();
+//                    PostLoader postLoader = new PostLoader(getApplicationContext());
+//                    newPostsCount = postLoader.refresh_posts();
 
-                    if (newPostsCount > 0) {
+                    new PostLoad(getApplicationContext(), null).execute(true);
 
-                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext()).
-                                setSmallIcon(R.drawable.ic_launcher).
-                                setContentTitle(getText(R.string.app_name)).
-                                setContentText("Loaded new posts!").
-                                setNumber(newPostsCount).
-                                setAutoCancel(true);
-                        builder.setContentIntent(resultPendingIntent);
-                        mNotificationManager.notify(mNotificationId + 1, builder.build());
-                    }
+//                    if (newPostsCount > 0) {
+//
+//                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext()).
+//                                setSmallIcon(R.drawable.ic_launcher).
+//                                setContentTitle(getText(R.string.app_name)).
+//                                setContentText("Loaded new posts!").
+//                                setNumber(newPostsCount).
+//                                setAutoCancel(true);
+//                        builder.setContentIntent(resultPendingIntent);
+//                        mNotificationManager.notify(mNotificationId + 1, builder.build());
+//                    }
 
                     mBuilder.setContentText("Last check: " + simpleDateFormat.format(new Date()));
                     startForeground(mNotificationId, mBuilder.build());

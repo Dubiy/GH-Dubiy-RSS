@@ -26,7 +26,7 @@ import ua.ck.geekhub.android.dubiy.rssreader.asynctask.PostLoad;
 import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 import ua.ck.geekhub.android.dubiy.rssreader.fragment.ArticleFragment;
-import ua.ck.geekhub.android.dubiy.rssreader.utils.PostLoader;
+
 
 public class ArticleActivity extends BaseActivity implements ArticleFragment.OnFragmentInteractionListener {
     private long postId = -1;

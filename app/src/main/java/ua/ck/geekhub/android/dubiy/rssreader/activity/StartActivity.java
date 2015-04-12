@@ -78,7 +78,15 @@ public class StartActivity extends BaseActivity implements TopicsFragment.OnFrag
             public void onReceive(Context context, Intent intent) {
                 int status = intent.getIntExtra(Const.PARAM_STATUS, 0);
                 Log.d(LOG_TAG, "onReceive: status = " + status);
-                Toast.makeText(getApplication(), "onReceive: status = " + status, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplication(), "onReceive: status = " + status, Toast.LENGTH_SHORT).show();
+                TopicsFragment topicsFragment = (TopicsFragment)getFragmentManager().findFragmentById(R.id.fragment_topics);
+                if (topicsFragment != null) {
+                    topicsFragment.reload_list();
+                }
+
+
+
+
             }
         };
         IntentFilter intentFilter = new IntentFilter(Const.BROADCAST_ACTION);

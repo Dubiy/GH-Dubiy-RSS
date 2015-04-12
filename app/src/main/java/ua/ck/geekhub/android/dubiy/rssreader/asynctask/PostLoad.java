@@ -233,5 +233,12 @@ public class PostLoad extends AsyncTask<Object, Void, Integer> {
                 habraAdapter.notifyDataSetInvalidated();
             }
         }
+
+
+        Intent i = new Intent("ua.ck.geekhub.android.dubiy.rssreader");
+        i.putExtra(Const.PARAM_STATUS, newPostsCount);
+        context.sendBroadcast(i);
+
+
     }
 }

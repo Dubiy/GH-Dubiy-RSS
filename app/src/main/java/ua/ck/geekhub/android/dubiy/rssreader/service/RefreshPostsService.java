@@ -24,7 +24,7 @@ import ua.ck.geekhub.android.dubiy.rssreader.activity.StartActivity;
 import ua.ck.geekhub.android.dubiy.rssreader.asynctask.PostLoad;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
 import ua.ck.geekhub.android.dubiy.rssreader.utils.Const;
-import ua.ck.geekhub.android.dubiy.rssreader.utils.PostLoader;
+
 
 /**
  * Created by Gary on 08.12.2014.

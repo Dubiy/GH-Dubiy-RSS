@@ -25,7 +25,7 @@ import ua.ck.geekhub.android.dubiy.rssreader.adapter.HabraAdapter;
 import ua.ck.geekhub.android.dubiy.rssreader.asynctask.PostLoad;
 import ua.ck.geekhub.android.dubiy.rssreader.database.DBHelper;
 import ua.ck.geekhub.android.dubiy.rssreader.entity.PostEntity;
-import ua.ck.geekhub.android.dubiy.rssreader.utils.PostLoader;
+
 
 public class TopicsFragment extends BaseFragment {
     private ListView listView;
